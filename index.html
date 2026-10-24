@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pick & Mix - Liverpool</title>
+
+  <!-- Configuración PWA / Web App para Pantalla Completa -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#e11d48">
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    body {
+      background-color: #f8fafc;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+  </style>
+</head>
+<body class="pb-12 min-h-screen">
+
+  <!-- ENCABEZADO -->
+  <header class="bg-rose-600 text-white p-4 shadow-md sticky top-0 z-30">
+    <div class="max-w-4xl mx-auto flex justify-between items-center">
+      <div class="flex items-center gap-2">
+        <i data-lucide="candy" class="w-7 h-7"></i>
+        <div>
+          <h1 class="font-bold text-lg leading-tight">Pick & Mix Liverpool</h1>
+          <p class="text-xs text-rose-100">Control de Rotación y Frescura</p>
+        </div>
+      </div>
+      <div class="flex gap-2">
+        <button onclick="exportarCSV()" class="bg-rose-700 hover:bg-rose-800 text-white text-xs px-3 py-2 rounded-lg flex items-center gap-1 transition">
+          <i data-lucide="download" class="w-4 h-4"></i>
+          <span>Exportar</span>
+        </button>
+        <button onclick="confirmarVaciarTodo()" class="bg-rose-800 hover:bg-rose-900 text-white text-xs px-3 py-2 rounded-lg flex items-center gap-1 transition">
+          <i data-lucide="trash-2" class="w-4 h-4"></i>
+          <span class="hidden sm:inline">Vaciar Todo</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-4xl mx-auto p-4 space-y-6">
+
+    <!-- FORMULARIO DE REGISTRO -->
+    <section class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
+      <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
+        <i data-lucide="plus-circle" class="w-5 h-5 text-rose-600"></i>
+        Registrar Nuevo Dulce en Exhibición
+      </h2>
+
+      <form id="formDulce" onsubmit="guardarRegistro(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        
+        <!-- Nombre del Dulce -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Nombre del Dulce</label>
+          <input type="text" id="nombre" required placeholder="Ej. Gomitas de Panda, Chocolates..." class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-rose-500 focus:outline-none">
+        </div>
+
+        <!-- Código / SKU -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Código o SKU</label>
+          <input type="text" id="codigo" required placeholder="Ej. 12345678" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-rose-500 focus:outline-none">
+        </div>
+
+        <!-- Seleccionar Mesa por Color -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Mesa / Exhibidor</label>
+          <select id="mesa" required onchange="actualizarDiasRecomendados()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-rose-500 focus:outline-none bg-white">
+            <option value="Roja">Mesa Roja (Gomitas / Pulpas - 15 días)</option>
+            <option value="Azul">Mesa Azul (Caramelos duros - 30 días)</option>
+            <option value="Verde">Mesa Verde (Botanas / Semillas - 10 días)</option>
+            <option value="Amarilla">Mesa Amarilla (Chocolates - 30 días)</option>
+            <option value="Naranja">Mesa Naranja (Chiles / Tamarindos - 20 días)</option>
+            <option value="Morada">Mesa Morada (Especialidades - 15 días)</option>
+            <option value="Otra">Otra Mesa / Sección (Custom)</option>
+          </select>
+        </div>
+
+        <!-- Peso Exhbido -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Peso Colocado (kg o g)</label>
+          <input type="text" id="peso" required placeholder="Ej. 2.5 kg o 500 g" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-rose-500 focus:outline-none">
+        </div>
+
+        <!-- Fecha de Ingreso -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Fecha de Ingreso / Exhibición</label>
+          <input type="date" id="fechaIngreso" required onchange="calcularFechaCambio()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-rose-500 focus:outline-none">
+        </div>
+
+        <!-- Días de Vida Útil Recomendada -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Días para Cambio / Rotación</label>
+          <input type="number" id="diasVida" value="15" min="1" required onchange="calcularFechaCambio()" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-rose-500 focus:outline-none">
+        </div>
+
+        <!-- Botón de Envío -->
+        <div class="md:col-span-2 pt-2">
+          <button type="submit" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-semibold py-2.5 rounded-lg text-sm transition shadow-sm flex justify-center items-center gap-2">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+            Guardar Registro
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- BARRA DE BÚSQUEDA Y FILTROS -->
+    <section class="flex flex-col sm:flex-row gap-3 justify-between items-center">
+      <div class="relative w-full sm:w-64">
+        <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-3"></i>
+        <input type="text" id="buscador" oninput="renderizarRegistros()" placeholder="Buscar dulce o código..." class="w-full pl-9 pr-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-rose-500 focus:outline-none">
+      </div>
+
+      <div class="flex gap-2 w-full sm:w-auto overflow-x-auto pb-1">
+        <select id="filtroMesa" onchange="renderizarRegistros()" class="px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:outline-none">
+          <option value="TODAS">Todas las Mesas</option>
+          <option value="Roja">Mesa Roja</option>
+          <option value="Azul">Mesa Azul</option>
+          <option value="Verde">Mesa Verde</option>
+          <option value="Amarilla">Mesa Amarilla</option>
+          <option value="Naranja">Mesa Naranja</option>
+          <option value="Morada">Mesa Morada</option>
+          <option value="Otra">Otras</option>
+        </select>
+      </div>
+    </section>
+
+    <!-- LISTA DE TARJETAS DE DULCES -->
+    <section id="contenedorLista" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- Se llena dinámicamente con JS -->
+    </section>
+
+  </main>
+
+  <!-- MODAL DE CONFIRMACIÓN DE BORRADO -->
+  <div id="modalConfirmacion" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 text-center space-y-4 shadow-xl">
+      <div class="w-12 h-12 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto">
+        <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+      </div>
+      <h3 id="modalTitulo" class="font-bold text-slate-800 text-lg">¿Eliminar registro?</h3>
+      <p id="modalMensaje" class="text-xs text-slate-500">Esta acción no se puede deshacer.</p>
+      <div class="flex gap-3 pt-2">
+        <button onclick="cerrarModal()" class="flex-1 py-2 border border-slate-300 text-slate-600 rounded-lg text-sm font-semibold hover:bg-slate-50">Cancelar</button>
+        <button id="btnConfirmarAccion" class="flex-1 py-2 bg-rose-600 text-white rounded-lg text-sm font-semibold hover:bg-rose-700">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPT LÓGICO DE LA APLICACIÓN -->
+  <script>
+    let registros = JSON.parse(localStorage.getItem('pick_mix_dulces')) || [];
+    let idEliminar = null;
+    let vaciarTodoFlag = false;
+
+    // Configuración de reglas por color de mesa
+    const reglasMesas = {
+      'Roja': 15,
+      'Azul': 30,
+      'Verde': 10,
+      'Amarilla': 30,
+      'Naranja': 20,
+      'Morada': 15,
+      'Otra': 15
+    };
+
+    // Inicializar app
+    document.addEventListener('DOMContentLoaded', () => {
+      // Establecer fecha actual por defecto en el formulario
+      document.getElementById('fechaIngreso').value = new Date().toISOString().split('T')[0];
+      actualizarDiasRecomendados();
+      renderizarRegistros();
+      lucide.createIcons();
+    });
+
+    // Actualizar días sugeridos al cambiar la mesa
+    function actualizarDiasRecomendados() {
+      const mesa = document.getElementById('mesa').value;
+      const dias = reglasMesas[mesa] || 15;
+      document.getElementById('diasVida').value = dias;
+    }
+
+    // Guardar nuevo dulce
+    function guardarRegistro(e) {
+      e.preventDefault();
+
+      const nombre = document.getElementById('nombre').value.trim();
+      const codigo = document.getElementById('codigo').value.trim();
+      const mesa = document.getElementById('mesa').value;
+      const peso = document.getElementById('peso').value.trim();
+      const fechaIngreso = document.getElementById('fechaIngreso').value;
+      const diasVida = parseInt(document.getElementById('diasVida').value);
+
+      // Calcular fecha límite de cambio
+      const fechaObj = new Date(fechaIngreso + 'T00:00:00');
+      fechaObj.setDate(fechaObj.getDate() + diasVida);
+      const fechaCambio = fechaObj.toISOString().split('T')[0];
+
+      const nuevoRegistro = {
+        id: Date.now(),
+        nombre,
+        codigo,
+        mesa,
+        peso,
+        fechaIngreso,
+        diasVida,
+        fechaCambio
+      };
+
+      registros.unshift(nuevoRegistro);
+      guardarEnLocalStorage();
+      renderizarRegistros();
+
+      // Limpiar formulario excepto fecha
+      document.getElementById('nombre').value = '';
+      document.getElementById('codigo').value = '';
+      document.getElementById('peso').value = '';
+    }
+
+    // Calular estado del semáforo
+    function obtenerEstadoSemaforo(fechaCambio) {
+      const hoy = new Date();
+      hoy.setHours(0,0,0,0);
+      
+      const limite = new Date(fechaCambio + 'T00:00:00');
+      const diferenciaDias = Math.ceil((limite - hoy) / (1000 * 60 * 60 * 24));
+
+      if (diferenciaDias < 0) {
+        return { estado: 'VENCIDO', color: 'bg-red-500', texto: 'Red', badge: 'bg-red-100 text-red-700 border-red-200', mensaje: `Cambio vencido hace ${Math.abs(diferenciaDias)} días` };
+      } else if (diferenciaDias === 0) {
+        return { estado: 'HOY', color: 'bg-red-500', texto: 'Red', badge: 'bg-red-100 text-red-700 border-red-200', mensaje: '¡Cambiar HOY mismo!' };
+      } else if (diferenciaDias <= 3) {
+        return { estado: 'ALERTA', color: 'bg-amber-500', texto: 'Yellow', badge: 'bg-amber-100 text-amber-700 border-amber-200', mensaje: `Cambio en ${diferenciaDias} días` };
+      } else {
+        return { estado: 'OK', color: 'bg-emerald-500', texto: 'Green', badge: 'bg-emerald-100 text-emerald-700 border-emerald-200', mensaje: `Fresco (${diferenciaDias} días restantes)` };
+      }
+    }
+
+    // Obtener badge de color de mesa
+    function obtenerBadgeMesa(mesa) {
+      const colores = {
+        'Roja': 'bg-rose-100 text-rose-800 border-rose-300',
+        'Azul': 'bg-sky-100 text-sky-800 border-sky-300',
+        'Verde': 'bg-emerald-100 text-emerald-800 border-emerald-300',
+        'Amarilla': 'bg-amber-100 text-amber-800 border-amber-300',
+        'Naranja': 'bg-orange-100 text-orange-800 border-orange-300',
+        'Morada': 'bg-purple-100 text-purple-800 border-purple-300',
+        'Otra': 'bg-slate-100 text-slate-800 border-slate-300'
+      };
+      return colores[mesa] || colores['Otra'];
+    }
+
+    // Renderizar lista en pantalla
+    function renderizarRegistros() {
+      const contenedor = document.getElementById('contenedorLista');
+      const busqueda = document.getElementById('buscador').value.toLowerCase();
+      const filtroMesa = document.getElementById('filtroMesa').value;
+
+      contenedor.innerHTML = '';
+
+      const filtrados = registros.filter(r => {
+        const coincideBusqueda = r.nombre.toLowerCase().includes(busqueda) || r.codigo.toLowerCase().includes(busqueda);
+        const coincideMesa = filtroMesa === 'TODAS' || r.mesa === filtroMesa;
+        return coincideBusqueda && coincideMesa;
+      });
+
+      if (filtrados.length === 0) {
+        contenedor.innerHTML = `
+          <div class="col-span-full text-center py-12 bg-white rounded-2xl border border-dashed border-slate-300">
+            <i data-lucide="inbox" class="w-10 h-10 text-slate-300 mx-auto mb-2"></i>
+            <p class="text-sm font-semibold text-slate-500">No hay dulces registrados en este filtro.</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      filtrados.forEach(r => {
+        const semaforo = obtenerEstadoSemaforo(r.fechaCambio);
+        const badgeMesa = obtenerBadgeMesa(r.mesa);
+
+        const card = document.createElement('div');
+        card.className = "bg-white rounded-xl p-4 shadow-sm border border-slate-200 relative overflow-hidden flex flex-col justify-between";
+        card.innerHTML = `
+          <div class="absolute top-0 left-0 w-2 h-full ${semaforo.color}"></div>
+          
+          <div>
+            <div class="flex justify-between items-start gap-2 mb-2 pl-2">
+              <div>
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${badgeMesa}">
+                  Mesa ${r.mesa}
+                </span>
+                <h3 class="font-bold text-slate-800 text-base mt-1">${r.nombre}</h3>
+                <p class="text-xs text-slate-400 font-mono">SKU: ${r.codigo}</p>
+              </div>
+
+              <span class="text-xs font-semibold px-2.5 py-1 rounded-lg border ${semaforo.badge} flex items-center gap-1">
+                <span class="w-2 h-2 rounded-full ${semaforo.color}"></span>
+                ${semaforo.mensaje}
+              </span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 text-xs bg-slate-50 p-2.5 rounded-lg my-3 pl-3">
+              <div>
+                <span class="text-slate-400 block">Exhibido el:</span>
+                <span class="font-semibold text-slate-700">${r.fechaIngreso}</span>
+              </div>
+              <div>
+                <span class="text-slate-400 block">Fecha de cambio:</span>
+                <span class="font-semibold text-slate-700">${r.fechaCambio}</span>
+              </div>
+              <div>
+                <span class="text-slate-400 block">Peso exhibido:</span>
+                <span class="font-semibold text-slate-700">${r.peso}</span>
+              </div>
+              <div>
+                <span class="text-slate-400 block">Vida útil:</span>
+                <span class="font-semibold text-slate-700">${r.diasVida} días</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex justify-between items-center pt-2 border-t border-slate-100 pl-2">
+            <button onclick="rotarHoy(${r.id})" class="text-xs text-rose-600 hover:text-rose-700 font-semibold flex items-center gap-1">
+              <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+              Rotar Hoy
+            </button>
+
+            <button onclick="confirmarEliminarUnico(${r.id}, '${r.nombre}')" class="text-xs text-slate-400 hover:text-red-500 p-1.5 transition">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          </div>
+        `;
+        contenedor.appendChild(card);
+      });
+
+      lucide.createIcons();
+    }
+
+    // Acción para rotar dulce hoy (renovar fecha)
+    function rotarHoy(id) {
+      const hoy = new Date().toISOString().split('T')[0];
+      registros = registros.map(r => {
+        if (r.id === id) {
+          const fechaObj = new Date(hoy + 'T00:00:00');
+          fechaObj.setDate(fechaObj.getDate() + r.diasVida);
+          return {
+            ...r,
+            fechaIngreso: hoy,
+            fechaCambio: fechaObj.toISOString().split('T')[0]
+          };
+        }
+        return r;
+      });
+      guardarEnLocalStorage();
+      renderizarRegistros();
+    }
+
+    // Eliminar individual
+    function confirmarEliminarUnico(id, nombre) {
+      idEliminar = id;
+      vaciarTodoFlag = false;
+      document.getElementById('modalTitulo').textContent = '¿Eliminar producto?';
+      document.getElementById('modalMensaje').textContent = `Se borrará "${nombre}" de la lista.`;
+      document.getElementById('modalConfirmacion').classList.remove('hidden');
+    }
+
+    // Vaciar todo
+    function confirmarVaciarTodo() {
+      if (registros.length === 0) return;
+      vaciarTodoFlag = true;
+      document.getElementById('modalTitulo').textContent = '¿Vaciar toda la lista?';
+      document.getElementById('modalMensaje').textContent = 'Se eliminarán TODOS los registros guardados.';
+      document.getElementById('modalConfirmacion').classList.remove('hidden');
+    }
+
+    // Botón confirmar modal
+    document.getElementById('btnConfirmarAccion').addEventListener('click', () => {
+      if (vaciarTodoFlag) {
+        registros = [];
+      } else if (idEliminar) {
+        registros = registros.filter(r => r.id !== idEliminar);
+      }
+      guardarEnLocalStorage();
+      renderizarRegistros();
+      cerrarModal();
+    });
+
+    function cerrarModal() {
+      idEliminar = null;
+      vaciarTodoFlag = false;
+      document.getElementById('modalConfirmacion').classList.add('hidden');
+    }
+
+    // Guardar en LocalStorage
+    function guardarEnLocalStorage() {
+      localStorage.setItem('pick_mix_dulces', JSON.stringify(registros));
+    }
+
+    // Exportar datos a CSV
+    function exportarCSV() {
+      if (registros.length === 0) {
+        alert('No hay registros para exportar.');
+        return;
+      }
+
+      let csv = 'Nombre,Codigo SKU,Mesa,Peso,Fecha Ingreso,Dias Vida,Fecha Cambio,Estado\n';
+      registros.forEach(r => {
+        const semaforo = obtenerEstadoSemaforo(r.fechaCambio);
+        csv += `"${r.nombre}","${r.codigo}","${r.mesa}","${r.peso}","${r.fechaIngreso}",${r.diasVida},"${r.fechaCambio}","${semaforo.estado}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Reporte_Pick_And_Mix_${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>
