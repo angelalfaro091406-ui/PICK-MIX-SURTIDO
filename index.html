@@ -26,126 +26,135 @@
       color: #0f172a;
     }
 
-    /* Scrollbar oculta para chips horizontales */
-    .no-scrollbar::-webkit-scrollbar {
-      display: none;
-    }
-    .no-scrollbar {
-      -ms-overflow-style: none;
-      scrollbar-width: none;
-    }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
 <body class="pb-16 min-h-screen antialiased">
 
-  <!-- BARRITA DE ESTADO DE NOTIFICACIONES -->
-  <div id="bannerNotificaciones" class="bg-slate-900 text-white text-xs px-4 py-2 flex justify-between items-center hidden">
-    <span class="flex items-center gap-2">
-      🔔 Activa las notificaciones para recibir avisos de cambios de dulce.
-    </span>
-    <button onclick="solicitarPermisoNotificaciones()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-3 py-1 rounded-lg text-[11px] transition">
-      Activar
-    </button>
+  <!-- PANTALLA DE LOGIN -->
+  <div id="seccionLogin" class="fixed inset-0 bg-slate-900/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-5 text-center">
+      <div class="w-16 h-16 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center text-3xl mx-auto shadow-inner">
+        🍬
+      </div>
+      <div>
+        <h2 class="font-extrabold text-slate-800 text-xl">Pick & Mix Liverpool</h2>
+        <p class="text-xs text-slate-400 mt-1">Acceso de Equipo en Tiempo Real</p>
+      </div>
+
+      <form id="formLogin" onsubmit="iniciarSesion(event)" class="space-y-3 text-left">
+        <div>
+          <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Correo de Equipo</label>
+          <input type="email" id="loginEmail" required placeholder="ejemplo@liverpool.com" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-rose-500 focus:outline-none bg-slate-50">
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Contraseña</label>
+          <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-rose-500 focus:outline-none bg-slate-50">
+        </div>
+        
+        <p id="errorLogin" class="text-xs text-rose-600 font-bold hidden text-center pt-1"></p>
+
+        <button type="submit" id="btnIngresar" class="w-full bg-rose-600 hover:bg-rose-700 active:scale-98 text-white font-bold py-3 rounded-xl text-xs transition shadow-lg shadow-rose-200 mt-2">
+          Ingresar a la Plataforma
+        </button>
+      </form>
+    </div>
   </div>
 
-  <!-- ENCABEZADO LIVERPOOL -->
-  <header class="bg-gradient-to-r from-rose-600 via-rose-500 to-pink-600 text-white p-4 shadow-lg sticky top-0 z-30">
-    <div class="max-w-3xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-      
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-xl shadow-inner">
-          🍬
-        </div>
-        <div>
-          <div class="flex items-center gap-2">
-            <h1 class="font-extrabold text-xl tracking-tight leading-none">Pick & Mix</h1>
-            <span class="bg-white/25 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-white/30">Liverpool</span>
+  <!-- APLICACIÓN PRINCIPAL -->
+  <div id="appContenido" class="hidden">
+    
+    <!-- ENCABEZADO LIVERPOOL -->
+    <header class="bg-gradient-to-r from-rose-600 via-rose-500 to-pink-600 text-white p-4 shadow-lg sticky top-0 z-30">
+      <div class="max-w-3xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-xl shadow-inner">
+            🍬
           </div>
-          <p class="text-xs text-rose-100 font-medium mt-1">Control de Rotación y Frescura en Exhibición</p>
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="font-extrabold text-xl tracking-tight leading-none">Pick & Mix</h1>
+              <span class="bg-white/25 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-white/30">Liverpool Cloud</span>
+            </div>
+            <p class="text-xs text-rose-100 font-medium mt-1">Sincronizado en Tiempo Real</p>
+          </div>
         </div>
+
+        <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+          <button onclick="exportarCSV()" class="bg-white/15 hover:bg-white/25 text-white text-xs font-semibold px-3 py-2 rounded-xl border border-white/20 flex items-center gap-1.5 transition">
+            📊 <span>CSV</span>
+          </button>
+
+          <button onclick="cerrarSesion()" class="bg-white/15 hover:bg-white/25 text-white text-xs font-semibold px-3 py-2 rounded-xl border border-white/20 transition">
+            🚪 Salir
+          </button>
+
+          <button onclick="abrirModalForm()" class="bg-white text-rose-600 hover:bg-rose-50 font-bold text-xs px-3.5 py-2 rounded-xl shadow-md flex items-center gap-1.5 transition">
+            ➕ <span>Registrar Dulce</span>
+          </button>
+        </div>
+
       </div>
+    </header>
 
-      <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
-        <button onclick="exportarCSV()" class="bg-white/15 hover:bg-white/25 active:scale-95 text-white text-xs font-semibold px-3 py-2 rounded-xl border border-white/20 flex items-center gap-1.5 transition">
-          📊 <span>Exportar CSV</span>
-        </button>
+    <main class="max-w-3xl mx-auto p-4 space-y-5">
 
-        <button onclick="confirmarVaciarTodo()" class="bg-white/15 hover:bg-white/25 active:scale-95 text-white text-xs font-semibold p-2 rounded-xl border border-white/20 transition">
-          🗑️
-        </button>
-
-        <button onclick="abrirModalForm()" class="bg-white text-rose-600 hover:bg-rose-50 active:scale-95 font-bold text-xs px-3.5 py-2 rounded-xl shadow-md flex items-center gap-1.5 transition">
-          ➕ <span>Registrar Dulce</span>
-        </button>
-      </div>
-
-    </div>
-  </header>
-
-  <main class="max-w-3xl mx-auto p-4 space-y-5">
-
-    <!-- DASHBOARD RESUMEN -->
-    <section class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-      
-      <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-slate-200/80 flex justify-between items-center">
-        <div>
-          <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Registrados</p>
-          <p id="statTotal" class="text-2xl font-black text-slate-800 mt-0.5">0</p>
+      <!-- DASHBOARD RESUMEN -->
+      <section class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-slate-200/80 flex justify-between items-center">
+          <div>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Registrados</p>
+            <p id="statTotal" class="text-2xl font-black text-slate-800 mt-0.5">0</p>
+          </div>
+          <div class="w-9 h-9 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center text-lg">📦</div>
         </div>
-        <div class="w-9 h-9 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center text-lg">
-          📦
+
+        <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-slate-200/80 flex justify-between items-center">
+          <div>
+            <p class="text-[10px] font-bold text-rose-500 uppercase tracking-wider">Cambiar Ya / Vencidos</p>
+            <p id="statVencidos" class="text-2xl font-black text-rose-600 mt-0.5">0</p>
+          </div>
+          <div class="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center text-lg">⚠️</div>
         </div>
-      </div>
 
-      <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-slate-200/80 flex justify-between items-center">
-        <div>
-          <p class="text-[10px] font-bold text-rose-500 uppercase tracking-wider">Cambiar Ya / Vencidos</p>
-          <p id="statVencidos" class="text-2xl font-black text-rose-600 mt-0.5">0</p>
+        <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-slate-200/80 flex justify-between items-center">
+          <div>
+            <p class="text-[10px] font-bold text-amber-500 uppercase tracking-wider">Próximos (≤ 3 Días)</p>
+            <p id="statAlertas" class="text-2xl font-black text-amber-600 mt-0.5">0</p>
+          </div>
+          <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg">⏰</div>
         </div>
-        <div class="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center text-lg">
-          ⚠️
+
+        <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-slate-200/80 flex justify-between items-center">
+          <div>
+            <p class="text-[10px] font-bold text-emerald-500 uppercase tracking-wider">Frescos</p>
+            <p id="statFrescos" class="text-2xl font-black text-emerald-600 mt-0.5">0</p>
+          </div>
+          <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg">✅</div>
         </div>
-      </div>
+      </section>
 
-      <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-slate-200/80 flex justify-between items-center">
-        <div>
-          <p class="text-[10px] font-bold text-amber-500 uppercase tracking-wider">Próximos (≤ 3 Días)</p>
-          <p id="statAlertas" class="text-2xl font-black text-amber-600 mt-0.5">0</p>
+      <!-- BÚSQUEDA Y CHIPS DE MESA -->
+      <section class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 space-y-3">
+        <div class="relative">
+          <span class="absolute left-3.5 top-3 text-slate-400 text-sm">🔍</span>
+          <input type="text" id="buscador" oninput="renderizarRegistros()" placeholder="Buscar dulce por nombre o código barcode/SKU..." class="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-rose-500 focus:outline-none bg-slate-50/50">
         </div>
-        <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg">
-          ⏰
+
+        <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pt-1 pb-0.5">
+          <span class="text-xs font-bold text-slate-400 shrink-0 mr-1">Filtrar Mesa:</span>
+          <div id="contenedorChips" class="flex items-center gap-2"></div>
         </div>
-      </div>
+      </section>
 
-      <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-slate-200/80 flex justify-between items-center">
-        <div>
-          <p class="text-[10px] font-bold text-emerald-500 uppercase tracking-wider">Frescos</p>
-          <p id="statFrescos" class="text-2xl font-black text-emerald-600 mt-0.5">0</p>
-        </div>
-        <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg">
-          ✅
-        </div>
-      </div>
+      <!-- LISTA DE DULCES -->
+      <section id="contenedorLista" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5"></section>
 
-    </section>
+    </main>
 
-    <!-- BÚSQUEDA Y CHIPS DE MESA -->
-    <section class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 space-y-3">
-      <div class="relative">
-        <span class="absolute left-3.5 top-3 text-slate-400 text-sm">🔍</span>
-        <input type="text" id="buscador" oninput="renderizarRegistros()" placeholder="Buscar dulce por nombre o código barcode/SKU..." class="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-rose-500 focus:outline-none bg-slate-50/50">
-      </div>
-
-      <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pt-1 pb-0.5">
-        <span class="text-xs font-bold text-slate-400 shrink-0 mr-1">Filtrar Mesa:</span>
-        <div id="contenedorChips" class="flex items-center gap-2"></div>
-      </div>
-    </section>
-
-    <!-- LISTA DE DULCES -->
-    <section id="contenedorLista" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5"></section>
-
-  </main>
+  </div>
 
   <!-- MODAL FORMULARIO DE REGISTRO -->
   <div id="modalForm" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
@@ -161,7 +170,7 @@
       <form id="formDulce" onsubmit="guardarRegistro(event)" class="space-y-3">
         <div>
           <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Nombre del Dulce</label>
-          <input type="text" id="nombre" required placeholder="Ej. Gomitas de Panda, Chocolates..." class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-rose-500 focus:outline-none bg-slate-50">
+          <input type="text" id="nombre" required placeholder="Ej. Gomitas de Panda" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-rose-500 focus:outline-none bg-slate-50">
         </div>
 
         <div>
@@ -202,33 +211,38 @@
         </div>
 
         <div class="pt-2">
-          <button type="submit" class="w-full bg-rose-600 hover:bg-rose-700 active:scale-98 text-white font-bold py-3 rounded-xl text-xs transition shadow-lg shadow-rose-200">
-            Guardar Dulce en Exhibición
+          <button type="submit" class="w-full bg-rose-600 hover:bg-rose-700 text-white font-bold py-3 rounded-xl text-xs transition shadow-lg shadow-rose-200">
+            Guardar en la Nube
           </button>
         </div>
       </form>
+
     </div>
   </div>
 
-  <!-- MODAL DE CONFIRMACIÓN DE BORRADO -->
-  <div id="modalConfirmacion" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-xs w-full p-6 text-center space-y-3 shadow-2xl">
-      <div class="w-12 h-12 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center text-xl mx-auto">⚠️</div>
-      <h3 id="modalTitulo" class="font-bold text-slate-800 text-base">¿Eliminar registro?</h3>
-      <p id="modalMensaje" class="text-xs text-slate-500">Esta acción no se puede deshacer.</p>
-      <div class="flex gap-2 pt-2">
-        <button onclick="cerrarModalConfirmacion()" class="flex-1 py-2.5 border border-slate-200 text-slate-600 rounded-xl text-xs font-bold hover:bg-slate-50">Cancelar</button>
-        <button id="btnConfirmarAccion" class="flex-1 py-2.5 bg-rose-600 text-white rounded-xl text-xs font-bold hover:bg-rose-700 shadow-md shadow-rose-100">Eliminar</button>
-      </div>
-    </div>
-  </div>
+  <!-- FIREBASE LIBRARIES -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getDatabase, ref, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-  <!-- LÓGICA JAVASCRIPT CON NOTIFICACIONES -->
-  <script>
-    let registros = JSON.parse(localStorage.getItem('pick_mix_dulces')) || [];
-    let mesaSeleccionada = 'TODAS';
-    let idEliminar = null;
-    let vaciarTodoFlag = false;
+    // Tu configuración de Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyCIME4E2vjDO8cAzxvcbzpaMHwPNtFK7oI",
+      authDomain: "pickandmix-4ac27.firebaseapp.com",
+      projectId: "pickandmix-4ac27",
+      storageBucket: "pickandmix-4ac27.firebasestorage.app",
+      messagingSenderId: "682208092457",
+      appId: "1:682208092457:web:8aabc06c7cf62f30125738",
+      databaseURL: "https://pickandmix-4ac27-default-rtdb.firebaseio.com"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    window.registros = [];
+    window.mesaSeleccionada = 'TODAS';
 
     const mesasConfig = [
       { id: 'TODAS', nombre: 'Todas', colorBg: 'bg-slate-900 text-white', dot: '' },
@@ -245,85 +259,57 @@
       'Roja': 15, 'Azul': 30, 'Verde': 10, 'Amarilla': 30, 'Naranja': 20, 'Morada': 15, 'Otra': 15
     };
 
-    document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('fechaIngreso').value = new Date().toISOString().split('T')[0];
-      actualizarDiasRecomendados();
-      renderizarChips();
-      renderizarRegistros();
-      verificarSoporteNotificaciones();
+    // Control de Sesión
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        document.getElementById('seccionLogin').classList.add('hidden');
+        document.getElementById('appContenido').classList.remove('hidden');
+        escucharBaseDeDatos();
+      } else {
+        document.getElementById('seccionLogin').classList.remove('hidden');
+        document.getElementById('appContenido').classList.add('hidden');
+      }
     });
 
-    /* --- SISTEMA DE NOTIFICACIONES --- */
-    function verificarSoporteNotificaciones() {
-      if ("Notification" in window) {
-        if (Notification.permission === "default") {
-          document.getElementById('bannerNotificaciones').classList.remove('hidden');
-        } else if (Notification.permission === "granted") {
-          enviarAlertaNotificacion();
+    window.iniciarSesion = (e) => {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value;
+      const pass = document.getElementById('loginPassword').value;
+      const btn = document.getElementById('btnIngresar');
+      const err = document.getElementById('errorLogin');
+
+      btn.disabled = true;
+      btn.textContent = "Cargando...";
+      err.classList.add('hidden');
+
+      signInWithEmailAndPassword(auth, email, pass)
+        .catch((error) => {
+          btn.disabled = false;
+          btn.textContent = "Ingresar a la Plataforma";
+          err.textContent = "Correo o contraseña incorrectos.";
+          err.classList.remove('hidden');
+        });
+    };
+
+    window.cerrarSesion = () => signOut(auth);
+
+    // Escuchar cambios en tiempo real en la nube
+    function escucharBaseDeDatos() {
+      const dbRef = ref(db, 'dulces');
+      onValue(dbRef, (snapshot) => {
+        const data = snapshot.val();
+        window.registros = [];
+        if (data) {
+          Object.keys(data).forEach(key => {
+            window.registros.unshift({ idCloud: key, ...data[key] });
+          });
         }
-      }
-    }
-
-    function solicitarPermisoNotificaciones() {
-      if ("Notification" in window) {
-        Notification.requestPermission().then(permission => {
-          if (permission === "granted") {
-            document.getElementById('bannerNotificaciones').classList.add('hidden');
-            enviarAlertaNotificacion();
-          }
-        });
-      }
-    }
-
-    function enviarAlertaNotificacion() {
-      if (Notification.permission !== "granted") return;
-
-      const hoy = new Date();
-      hoy.setHours(0,0,0,0);
-
-      const porCambiar = registros.filter(r => {
-        const limite = new Date(r.fechaCambio + 'T00:00:00');
-        return limite <= hoy;
-      });
-
-      if (porCambiar.length > 0) {
-        new Notification("🍬 Pick & Mix Liverpool", {
-          body: `¡Atención! Tienes ${porCambiar.length} producto(s) que requieren cambio hoy.`,
-          icon: "https://cdn-icons-png.flaticon.com/512/2542/2542588.png"
-        });
-      }
-    }
-
-    /* --- RESTO DE FUNCIONALIDADES --- */
-    function renderizarChips() {
-      const contenedor = document.getElementById('contenedorChips');
-      contenedor.innerHTML = '';
-
-      mesasConfig.forEach(m => {
-        const esActivo = mesaSeleccionada === m.id;
-        const btn = document.createElement('button');
-        btn.onclick = () => { mesaSeleccionada = m.id; renderizarChips(); renderizarRegistros(); };
-        
-        btn.className = `shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold transition border flex items-center gap-1.5 ${
-          esActivo 
-            ? 'bg-slate-900 text-white border-slate-900 shadow-md' 
-            : `${m.colorBg} opacity-80 hover:opacity-100`
-        }`;
-        
-        btn.innerHTML = `${m.dot} <span>${m.nombre}</span>`;
-        contenedor.appendChild(btn);
+        renderizarChips();
+        renderizarRegistros();
       });
     }
 
-    function actualizarDiasRecomendados() {
-      const mesa = document.getElementById('mesa').value;
-      document.getElementById('diasVida').value = reglasMesas[mesa] || 15;
-    }
-
-    function abrirModalForm() { document.getElementById('modalForm').classList.remove('hidden'); }
-    function cerrarModalForm() { document.getElementById('modalForm').classList.add('hidden'); }
-
-    function guardarRegistro(e) {
+    window.guardarRegistro = (e) => {
       e.preventDefault();
       const nombre = document.getElementById('nombre').value.trim();
       const codigo = document.getElementById('codigo').value.trim();
@@ -336,56 +322,59 @@
       fechaObj.setDate(fechaObj.getDate() + diasVida);
       const fechaCambio = fechaObj.toISOString().split('T')[0];
 
-      registros.unshift({
-        id: Date.now(), nombre, codigo, mesa, peso, fechaIngreso, diasVida, fechaCambio
+      push(ref(db, 'dulces'), {
+        nombre, codigo, mesa, peso, fechaIngreso, diasVida, fechaCambio, timestamp: Date.now()
       });
 
-      guardarEnLocalStorage();
-      renderizarRegistros();
       cerrarModalForm();
-      enviarAlertaNotificacion();
-
       document.getElementById('nombre').value = '';
       document.getElementById('codigo').value = '';
       document.getElementById('peso').value = '';
-    }
+    };
 
-    function obtenerEstadoSemaforo(fechaCambio) {
-      const hoy = new Date();
-      hoy.setHours(0,0,0,0);
-      const limite = new Date(fechaCambio + 'T00:00:00');
-      const diff = Math.ceil((limite - hoy) / (1000 * 60 * 60 * 24));
+    window.rotarHoy = (idCloud, diasVida) => {
+      const hoy = new Date().toISOString().split('T')[0];
+      const fechaObj = new Date(hoy + 'T00:00:00');
+      fechaObj.setDate(fechaObj.getDate() + diasVida);
+      const nuevaFechaCambio = fechaObj.toISOString().split('T')[0];
 
-      if (diff < 0) return { key: 'VENCIDOS', mensaje: `Vencido (${Math.abs(diff)}d)`, colorBarra: 'bg-rose-500', badge: 'bg-rose-100 text-rose-700' };
-      if (diff === 0) return { key: 'VENCIDOS', mensaje: '¡Cambiar HOY!', colorBarra: 'bg-rose-500', badge: 'bg-rose-100 text-rose-700' };
-      if (diff <= 3) return { key: 'ALERTAS', mensaje: `Cambio en ${diff}d`, colorBarra: 'bg-amber-500', badge: 'bg-amber-100 text-amber-700' };
-      return { key: 'FRESCOS', mensaje: `Fresco (${diff}d)`, colorBarra: 'bg-emerald-500', badge: 'bg-emerald-100 text-emerald-700' };
-    }
-
-    function actualizarDashboard() {
-      let vencidos = 0, alertas = 0, frescos = 0;
-      registros.forEach(r => {
-        const status = obtenerEstadoSemaforo(r.fechaCambio);
-        if (status.key === 'VENCIDOS') vencidos++;
-        else if (status.key === 'ALERTAS') alertas++;
-        else frescos++;
+      update(ref(db, `dulces/${idCloud}`), {
+        fechaIngreso: hoy,
+        fechaCambio: nuevaFechaCambio
       });
+    };
 
-      document.getElementById('statTotal').textContent = registros.length;
-      document.getElementById('statVencidos').textContent = vencidos;
-      document.getElementById('statAlertas').textContent = alertas;
-      document.getElementById('statFrescos').textContent = frescos;
-    }
+    window.eliminarRegistro = (idCloud) => {
+      if (confirm('¿Eliminar este dulce? Se actualizará para todo el equipo.')) {
+        remove(ref(db, `dulces/${idCloud}`));
+      }
+    };
 
-    function renderizarRegistros() {
+    // Renderizado
+    window.renderizarChips = () => {
+      const contenedor = document.getElementById('contenedorChips');
+      contenedor.innerHTML = '';
+      mesasConfig.forEach(m => {
+        const esActivo = window.mesaSeleccionada === m.id;
+        const btn = document.createElement('button');
+        btn.onclick = () => { window.mesaSeleccionada = m.id; renderizarChips(); renderizarRegistros(); };
+        btn.className = `shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold transition border flex items-center gap-1.5 ${
+          esActivo ? 'bg-slate-900 text-white border-slate-900 shadow-md' : `${m.colorBg} opacity-80 hover:opacity-100`
+        }`;
+        btn.innerHTML = `${m.dot} <span>${m.nombre}</span>`;
+        contenedor.appendChild(btn);
+      });
+    };
+
+    window.renderizarRegistros = () => {
       actualizarDashboard();
       const contenedor = document.getElementById('contenedorLista');
       const busqueda = document.getElementById('buscador').value.toLowerCase();
       contenedor.innerHTML = '';
 
-      const filtrados = registros.filter(r => {
+      const filtrados = window.registros.filter(r => {
         const matchSearch = r.nombre.toLowerCase().includes(busqueda) || r.codigo.toLowerCase().includes(busqueda);
-        const matchMesa = mesaSeleccionada === 'TODAS' || r.mesa === mesaSeleccionada;
+        const matchMesa = window.mesaSeleccionada === 'TODAS' || r.mesa === window.mesaSeleccionada;
         return matchSearch && matchMesa;
       });
 
@@ -394,12 +383,10 @@
           <div class="col-span-full bg-white rounded-3xl p-8 text-center border border-dashed border-slate-200 my-4 space-y-3">
             <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center text-3xl mx-auto">🍪</div>
             <p class="text-sm font-bold text-slate-700">No hay dulces en exhibición con este filtro</p>
-            <p class="text-xs text-slate-400">Ingresa un nuevo registro o cambia los filtros de búsqueda.</p>
             <button onclick="abrirModalForm()" class="mt-2 bg-rose-600 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-md">
               + Añadir Dulce
             </button>
-          </div>
-        `;
+          </div>`;
         return;
       }
 
@@ -420,108 +407,72 @@
                 <h3 class="font-extrabold text-slate-800 text-base mt-1.5 leading-tight">${r.nombre}</h3>
                 <p class="text-[11px] text-slate-400 font-mono mt-0.5">SKU: ${r.codigo}</p>
               </div>
-
-              <span class="text-[10px] font-bold px-2.5 py-1 rounded-lg ${semaforo.badge}">
-                ${semaforo.mensaje}
-              </span>
+              <span class="text-[10px] font-bold px-2.5 py-1 rounded-lg ${semaforo.badge}">${semaforo.mensaje}</span>
             </div>
 
             <div class="grid grid-cols-2 gap-2 text-[11px] bg-slate-50 p-2.5 rounded-xl my-3 pl-3 border border-slate-100">
-              <div>
-                <span class="text-slate-400 block">Exhibido el:</span>
-                <span class="font-bold text-slate-700">${r.fechaIngreso}</span>
-              </div>
-              <div>
-                <span class="text-slate-400 block">Fecha Cambio:</span>
-                <span class="font-bold text-slate-700">${r.fechaCambio}</span>
-              </div>
-              <div>
-                <span class="text-slate-400 block">Peso:</span>
-                <span class="font-bold text-slate-700">${r.peso}</span>
-              </div>
-              <div>
-                <span class="text-slate-400 block">Vida útil:</span>
-                <span class="font-bold text-slate-700">${r.diasVida} días</span>
-              </div>
+              <div><span class="text-slate-400 block">Exhibido:</span><span class="font-bold text-slate-700">${r.fechaIngreso}</span></div>
+              <div><span class="text-slate-400 block">Cambio:</span><span class="font-bold text-slate-700">${r.fechaCambio}</span></div>
+              <div><span class="text-slate-400 block">Peso:</span><span class="font-bold text-slate-700">${r.peso}</span></div>
+              <div><span class="text-slate-400 block">Vida útil:</span><span class="font-bold text-slate-700">${r.diasVida}d</span></div>
             </div>
           </div>
 
           <div class="flex justify-between items-center pt-2 border-t border-slate-100 pl-2">
-            <button onclick="rotarHoy(${r.id})" class="text-xs text-rose-600 hover:text-rose-700 font-bold flex items-center gap-1">
+            <button onclick="rotarHoy('${r.idCloud}', ${r.diasVida})" class="text-xs text-rose-600 hover:text-rose-700 font-bold flex items-center gap-1">
               🔄 Rotar Hoy
             </button>
-            <button onclick="confirmarEliminarUnico(${r.id}, '${r.nombre}')" class="text-xs text-slate-300 hover:text-rose-600 p-1 transition">
-              🗑️
-            </button>
-          </div>
-        `;
+            <button onclick="eliminarRegistro('${r.idCloud}')" class="text-xs text-slate-300 hover:text-rose-600 p-1 transition">🗑️</button>
+          </div>`;
         contenedor.appendChild(card);
       });
+    };
+
+    function obtenerEstadoSemaforo(fechaCambio) {
+      const hoy = new Date(); hoy.setHours(0,0,0,0);
+      const limite = new Date(fechaCambio + 'T00:00:00');
+      const diff = Math.ceil((limite - hoy) / (1000 * 60 * 60 * 24));
+
+      if (diff < 0) return { key: 'VENCIDOS', mensaje: `Vencido (${Math.abs(diff)}d)`, colorBarra: 'bg-rose-500', badge: 'bg-rose-100 text-rose-700' };
+      if (diff === 0) return { key: 'VENCIDOS', mensaje: '¡Cambiar HOY!', colorBarra: 'bg-rose-500', badge: 'bg-rose-100 text-rose-700' };
+      if (diff <= 3) return { key: 'ALERTAS', mensaje: `Cambio en ${diff}d`, colorBarra: 'bg-amber-500', badge: 'bg-amber-100 text-amber-700' };
+      return { key: 'FRESCOS', mensaje: `Fresco (${diff}d)`, colorBarra: 'bg-emerald-500', badge: 'bg-emerald-100 text-emerald-700' };
     }
 
-    function rotarHoy(id) {
-      const hoy = new Date().toISOString().split('T')[0];
-      registros = registros.map(r => {
-        if (r.id === id) {
-          const fechaObj = new Date(hoy + 'T00:00:00');
-          fechaObj.setDate(fechaObj.getDate() + r.diasVida);
-          return { ...r, fechaIngreso: hoy, fechaCambio: fechaObj.toISOString().split('T')[0] };
-        }
-        return r;
+    function actualizarDashboard() {
+      let vencidos = 0, alertas = 0, frescos = 0;
+      window.registros.forEach(r => {
+        const status = obtenerEstadoSemaforo(r.fechaCambio);
+        if (status.key === 'VENCIDOS') vencidos++;
+        else if (status.key === 'ALERTAS') alertas++;
+        else frescos++;
       });
-      guardarEnLocalStorage();
-      renderizarRegistros();
+      document.getElementById('statTotal').textContent = window.registros.length;
+      document.getElementById('statVencidos').textContent = vencidos;
+      document.getElementById('statAlertas').textContent = alertas;
+      document.getElementById('statFrescos').textContent = frescos;
     }
 
-    function confirmarEliminarUnico(id, nombre) {
-      idEliminar = id;
-      vaciarTodoFlag = false;
-      document.getElementById('modalTitulo').textContent = '¿Eliminar dulce?';
-      document.getElementById('modalMensaje').textContent = `Se borrará "${nombre}".`;
-      document.getElementById('modalConfirmacion').classList.remove('hidden');
-    }
+    window.abrirModalForm = () => document.getElementById('modalForm').classList.remove('hidden');
+    window.cerrarModalForm = () => document.getElementById('modalForm').classList.add('hidden');
+    window.actualizarDiasRecomendados = () => {
+      const mesa = document.getElementById('mesa').value;
+      document.getElementById('diasVida').value = reglasMesas[mesa] || 15;
+    };
 
-    function confirmarVaciarTodo() {
-      if (registros.length === 0) return;
-      vaciarTodoFlag = true;
-      document.getElementById('modalTitulo').textContent = '¿Vaciar lista?';
-      document.getElementById('modalMensaje').textContent = 'Se eliminarán TODOS los registros guardados.';
-      document.getElementById('modalConfirmacion').classList.remove('hidden');
-    }
-
-    document.getElementById('btnConfirmarAccion').addEventListener('click', () => {
-      if (vaciarTodoFlag) registros = [];
-      else if (idEliminar) registros = registros.filter(r => r.id !== idEliminar);
-      guardarEnLocalStorage();
-      renderizarRegistros();
-      cerrarModalConfirmacion();
-    });
-
-    function cerrarModalConfirmacion() {
-      idEliminar = null;
-      vaciarTodoFlag = false;
-      document.getElementById('modalConfirmacion').classList.add('hidden');
-    }
-
-    function guardarEnLocalStorage() {
-      localStorage.setItem('pick_mix_dulces', JSON.stringify(registros));
-    }
-
-    function exportarCSV() {
-      if (registros.length === 0) return alert('No hay registros para exportar.');
+    window.exportarCSV = () => {
+      if (window.registros.length === 0) return alert('No hay registros para exportar.');
       let csv = 'Nombre,Codigo SKU,Mesa,Peso,Fecha Ingreso,Dias Vida,Fecha Cambio,Estado\n';
-      registros.forEach(r => {
+      window.registros.forEach(r => {
         const semaforo = obtenerEstadoSemaforo(r.fechaCambio);
         csv += `"${r.nombre}","${r.codigo}","${r.mesa}","${r.peso}","${r.fechaIngreso}",${r.diasVida},"${r.fechaCambio}","${semaforo.key}"\n`;
       });
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `Reporte_Pick_Mix_${new Date().toISOString().split('T')[0]}.csv`;
-      a.click();
-    }
+      const a = document.createElement('a'); a.href = url; a.download = `Reporte_Pick_Mix_${new Date().toISOString().split('T')[0]}.csv`; a.click();
+    };
+
+    document.getElementById('fechaIngreso').value = new Date().toISOString().split('T')[0];
   </script>
 </body>
 </html>
-
