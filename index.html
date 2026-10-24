@@ -11,7 +11,10 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#e11d48">
 
-  <!-- Tailwind CSS & Lucide Icons -->
+  <!-- Manifest PWA -->
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
@@ -23,11 +26,6 @@
       color: #0f172a;
     }
 
-    .glass-card {
-      background: rgba(255, 255, 255, 0.9);
-      backdrop-filter: blur(12px);
-    }
-    
     /* Scrollbar oculta para chips horizontales */
     .no-scrollbar::-webkit-scrollbar {
       display: none;
@@ -39,6 +37,16 @@
   </style>
 </head>
 <body class="pb-16 min-h-screen antialiased">
+
+  <!-- BARRITA DE ESTADO DE NOTIFICACIONES -->
+  <div id="bannerNotificaciones" class="bg-slate-900 text-white text-xs px-4 py-2 flex justify-between items-center hidden">
+    <span class="flex items-center gap-2">
+      🔔 Activa las notificaciones para recibir avisos de cambios de dulce.
+    </span>
+    <button onclick="solicitarPermisoNotificaciones()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-3 py-1 rounded-lg text-[11px] transition">
+      Activar
+    </button>
+  </div>
 
   <!-- ENCABEZADO LIVERPOOL -->
   <header class="bg-gradient-to-r from-rose-600 via-rose-500 to-pink-600 text-white p-4 shadow-lg sticky top-0 z-30">
@@ -123,27 +131,19 @@
 
     <!-- BÚSQUEDA Y CHIPS DE MESA -->
     <section class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 space-y-3">
-      
-      <!-- Búsqueda -->
       <div class="relative">
         <span class="absolute left-3.5 top-3 text-slate-400 text-sm">🔍</span>
         <input type="text" id="buscador" oninput="renderizarRegistros()" placeholder="Buscar dulce por nombre o código barcode/SKU..." class="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-rose-500 focus:outline-none bg-slate-50/50">
       </div>
 
-      <!-- Chips de Mesas -->
       <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pt-1 pb-0.5">
         <span class="text-xs font-bold text-slate-400 shrink-0 mr-1">Filtrar Mesa:</span>
-        <div id="contenedorChips" class="flex items-center gap-2">
-          <!-- Chips inyectados dinámicamente -->
-        </div>
+        <div id="contenedorChips" class="flex items-center gap-2"></div>
       </div>
-
     </section>
 
     <!-- LISTA DE DULCES -->
-    <section id="contenedorLista" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-      <!-- Tarjetas de dulces -->
-    </section>
+    <section id="contenedorLista" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5"></section>
 
   </main>
 
@@ -159,7 +159,6 @@
       </div>
 
       <form id="formDulce" onsubmit="guardarRegistro(event)" class="space-y-3">
-        
         <div>
           <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Nombre del Dulce</label>
           <input type="text" id="nombre" required placeholder="Ej. Gomitas de Panda, Chocolates..." class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-rose-500 focus:outline-none bg-slate-50">
@@ -208,16 +207,13 @@
           </button>
         </div>
       </form>
-
     </div>
   </div>
 
   <!-- MODAL DE CONFIRMACIÓN DE BORRADO -->
   <div id="modalConfirmacion" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-xs w-full p-6 text-center space-y-3 shadow-2xl">
-      <div class="w-12 h-12 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center text-xl mx-auto">
-        ⚠️
-      </div>
+      <div class="w-12 h-12 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center text-xl mx-auto">⚠️</div>
       <h3 id="modalTitulo" class="font-bold text-slate-800 text-base">¿Eliminar registro?</h3>
       <p id="modalMensaje" class="text-xs text-slate-500">Esta acción no se puede deshacer.</p>
       <div class="flex gap-2 pt-2">
@@ -227,7 +223,7 @@
     </div>
   </div>
 
-  <!-- LÓGICA JAVASCRIPT -->
+  <!-- LÓGICA JAVASCRIPT CON NOTIFICACIONES -->
   <script>
     let registros = JSON.parse(localStorage.getItem('pick_mix_dulces')) || [];
     let mesaSeleccionada = 'TODAS';
@@ -254,8 +250,51 @@
       actualizarDiasRecomendados();
       renderizarChips();
       renderizarRegistros();
+      verificarSoporteNotificaciones();
     });
 
+    /* --- SISTEMA DE NOTIFICACIONES --- */
+    function verificarSoporteNotificaciones() {
+      if ("Notification" in window) {
+        if (Notification.permission === "default") {
+          document.getElementById('bannerNotificaciones').classList.remove('hidden');
+        } else if (Notification.permission === "granted") {
+          enviarAlertaNotificacion();
+        }
+      }
+    }
+
+    function solicitarPermisoNotificaciones() {
+      if ("Notification" in window) {
+        Notification.requestPermission().then(permission => {
+          if (permission === "granted") {
+            document.getElementById('bannerNotificaciones').classList.add('hidden');
+            enviarAlertaNotificacion();
+          }
+        });
+      }
+    }
+
+    function enviarAlertaNotificacion() {
+      if (Notification.permission !== "granted") return;
+
+      const hoy = new Date();
+      hoy.setHours(0,0,0,0);
+
+      const porCambiar = registros.filter(r => {
+        const limite = new Date(r.fechaCambio + 'T00:00:00');
+        return limite <= hoy;
+      });
+
+      if (porCambiar.length > 0) {
+        new Notification("🍬 Pick & Mix Liverpool", {
+          body: `¡Atención! Tienes ${porCambiar.length} producto(s) que requieren cambio hoy.`,
+          icon: "https://cdn-icons-png.flaticon.com/512/2542/2542588.png"
+        });
+      }
+    }
+
+    /* --- RESTO DE FUNCIONALIDADES --- */
     function renderizarChips() {
       const contenedor = document.getElementById('contenedorChips');
       contenedor.innerHTML = '';
@@ -281,13 +320,8 @@
       document.getElementById('diasVida').value = reglasMesas[mesa] || 15;
     }
 
-    function abrirModalForm() {
-      document.getElementById('modalForm').classList.remove('hidden');
-    }
-
-    function cerrarModalForm() {
-      document.getElementById('modalForm').classList.add('hidden');
-    }
+    function abrirModalForm() { document.getElementById('modalForm').classList.remove('hidden'); }
+    function cerrarModalForm() { document.getElementById('modalForm').classList.add('hidden'); }
 
     function guardarRegistro(e) {
       e.preventDefault();
@@ -309,6 +343,7 @@
       guardarEnLocalStorage();
       renderizarRegistros();
       cerrarModalForm();
+      enviarAlertaNotificacion();
 
       document.getElementById('nombre').value = '';
       document.getElementById('codigo').value = '';
@@ -329,7 +364,6 @@
 
     function actualizarDashboard() {
       let vencidos = 0, alertas = 0, frescos = 0;
-
       registros.forEach(r => {
         const status = obtenerEstadoSemaforo(r.fechaCambio);
         if (status.key === 'VENCIDOS') vencidos++;
@@ -345,10 +379,8 @@
 
     function renderizarRegistros() {
       actualizarDashboard();
-
       const contenedor = document.getElementById('contenedorLista');
       const busqueda = document.getElementById('buscador').value.toLowerCase();
-
       contenedor.innerHTML = '';
 
       const filtrados = registros.filter(r => {
@@ -379,7 +411,6 @@
         card.className = "bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 relative overflow-hidden flex flex-col justify-between";
         card.innerHTML = `
           <div class="absolute top-0 left-0 w-1.5 h-full ${semaforo.colorBarra}"></div>
-          
           <div>
             <div class="flex justify-between items-start gap-2 mb-2 pl-2">
               <div>
@@ -419,7 +450,6 @@
             <button onclick="rotarHoy(${r.id})" class="text-xs text-rose-600 hover:text-rose-700 font-bold flex items-center gap-1">
               🔄 Rotar Hoy
             </button>
-
             <button onclick="confirmarEliminarUnico(${r.id}, '${r.nombre}')" class="text-xs text-slate-300 hover:text-rose-600 p-1 transition">
               🗑️
             </button>
@@ -494,3 +524,4 @@
   </script>
 </body>
 </html>
+
