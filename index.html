@@ -1,36 +1,34 @@
-```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pick & Mix - Liverpool</title>
 
-  <!-- PWA Settings -->
+  <!-- PWA & Mobile Settings -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#e11d48">
 
-  <!-- Tailwind CSS -->
+  <!-- Tailwind CSS & Lucide Icons -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
 
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
     
-    * {
-      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-      -webkit-tap-highlight-color: transparent;
-    }
-
     body {
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
       background-color: #f8fafc;
       color: #0f172a;
     }
 
-    /* Custom scrollbar for horizontal chips */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(12px);
+    }
+    
+    /* Scrollbar oculta para chips horizontales */
     .no-scrollbar::-webkit-scrollbar {
       display: none;
     }
@@ -38,303 +36,261 @@
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
-
-    .glass-header {
-      background: linear-gradient(135deg, #e11d48 0%, #be123c 50%, #9f1239 100%);
-    }
-
-    .soft-shadow {
-      box-shadow: 0 10px 25px -5px rgba(225, 29, 72, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
-    }
   </style>
 </head>
-<body class="min-h-screen pb-12 selection:bg-rose-500 selection:text-white">
+<body class="pb-16 min-h-screen antialiased">
 
-  <!-- ENCABEZADO ESTILO LIVERPOOL -->
-  <header class="glass-header text-white px-4 pt-5 pb-6 shadow-lg rounded-b-3xl sticky top-0 z-30">
-    <div class="max-w-3xl mx-auto space-y-4">
+  <!-- ENCABEZADO LIVERPOOL -->
+  <header class="bg-gradient-to-r from-rose-600 via-rose-500 to-pink-600 text-white p-4 shadow-lg sticky top-0 z-30">
+    <div class="max-w-3xl mx-auto flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
       
-      <!-- Top Row: Logo & Title -->
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="w-11 h-11 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center border border-white/20 shadow-inner">
-            <i data-lucide="candy" class="w-6 h-6 text-white"></i>
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-xl shadow-inner">
+          🍬
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="font-extrabold text-xl tracking-tight leading-none">Pick & Mix</h1>
+            <span class="bg-white/25 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-white/30">Liverpool</span>
           </div>
-          <div>
-            <div class="flex items-center gap-2">
-              <h1 class="font-extrabold text-xl tracking-tight leading-none">Pick & Mix</h1>
-              <span class="bg-white/20 border border-white/30 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider text-rose-100">
-                Liverpool
-              </span>
-            </div>
-            <p class="text-xs text-rose-100/90 font-medium mt-1">Control de Rotación y Frescura en Exhibición</p>
-          </div>
+          <p class="text-xs text-rose-100 font-medium mt-1">Control de Rotación y Frescura en Exhibición</p>
         </div>
       </div>
 
-      <!-- Actions Row -->
-      <div class="flex items-center gap-2 pt-1 overflow-x-auto no-scrollbar">
-        <button onclick="exportarCSV()" class="bg-white/15 hover:bg-white/25 active:scale-95 text-white text-xs font-semibold px-3.5 py-2 rounded-xl flex items-center gap-1.5 backdrop-blur-sm border border-white/10 transition">
-          <i data-lucide="file-spread-sheet" class="w-4 h-4 text-emerald-300"></i>
-          <span>Exportar CSV</span>
+      <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+        <button onclick="exportarCSV()" class="bg-white/15 hover:bg-white/25 active:scale-95 text-white text-xs font-semibold px-3 py-2 rounded-xl border border-white/20 flex items-center gap-1.5 transition">
+          📊 <span>Exportar CSV</span>
         </button>
 
-        <button onclick="confirmarVaciarTodo()" class="bg-white/15 hover:bg-white/25 active:scale-95 text-white text-xs font-semibold px-3.5 py-2 rounded-xl flex items-center gap-1.5 backdrop-blur-sm border border-white/10 transition">
-          <i data-lucide="trash-2" class="w-4 h-4 text-rose-200"></i>
-          <span>Vaciar Todo</span>
+        <button onclick="confirmarVaciarTodo()" class="bg-white/15 hover:bg-white/25 active:scale-95 text-white text-xs font-semibold p-2 rounded-xl border border-white/20 transition">
+          🗑️
         </button>
 
-        <button onclick="abrirModal()" class="ml-auto bg-white hover:bg-rose-50 active:scale-95 text-rose-600 text-xs font-bold px-4 py-2 rounded-xl flex items-center gap-1.5 shadow-md transition">
-          <i data-lucide="plus" class="w-4 h-4 stroke-[3]"></i>
-          <span>Registrar Dulce</span>
+        <button onclick="abrirModalForm()" class="bg-white text-rose-600 hover:bg-rose-50 active:scale-95 font-bold text-xs px-3.5 py-2 rounded-xl shadow-md flex items-center gap-1.5 transition">
+          ➕ <span>Registrar Dulce</span>
         </button>
       </div>
 
     </div>
   </header>
 
-  <!-- CONTENIDO PRINCIPAL -->
-  <main class="max-w-3xl mx-auto px-4 mt-5 space-y-5">
+  <main class="max-w-3xl mx-auto p-4 space-y-5">
 
-    <!-- RESUMEN / DASHBOARD (4 TARJETAS) -->
+    <!-- DASHBOARD RESUMEN -->
     <section class="grid grid-cols-2 sm:grid-cols-4 gap-3">
       
-      <!-- Total Registrados -->
-      <div class="bg-white rounded-2xl p-3.5 border border-slate-100 soft-shadow flex items-center justify-between">
+      <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-slate-200/80 flex justify-between items-center">
         <div>
-          <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Total Registrados</p>
+          <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Registrados</p>
           <p id="statTotal" class="text-2xl font-black text-slate-800 mt-0.5">0</p>
         </div>
-        <div class="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center text-slate-600">
-          <i data-lucide="boxes" class="w-5 h-5"></i>
+        <div class="w-9 h-9 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center text-lg">
+          📦
         </div>
       </div>
 
-      <!-- Cambiar Ya / Vencidos -->
-      <div class="bg-white rounded-2xl p-3.5 border border-slate-100 soft-shadow flex items-center justify-between">
+      <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-slate-200/80 flex justify-between items-center">
         <div>
-          <p class="text-[10px] font-bold uppercase tracking-wider text-rose-500">Cambiar Ya / Vencidos</p>
+          <p class="text-[10px] font-bold text-rose-500 uppercase tracking-wider">Cambiar Ya / Vencidos</p>
           <p id="statVencidos" class="text-2xl font-black text-rose-600 mt-0.5">0</p>
         </div>
-        <div class="w-10 h-10 bg-rose-50 rounded-xl flex items-center justify-center text-rose-500">
-          <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+        <div class="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center text-lg">
+          ⚠️
         </div>
       </div>
 
-      <!-- Próximos (<= 3 Días) -->
-      <div class="bg-white rounded-2xl p-3.5 border border-slate-100 soft-shadow flex items-center justify-between">
+      <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-slate-200/80 flex justify-between items-center">
         <div>
-          <p class="text-[10px] font-bold uppercase tracking-wider text-amber-500">Próximos (≤ 3 Días)</p>
-          <p id="statProximos" class="text-2xl font-black text-amber-600 mt-0.5">0</p>
+          <p class="text-[10px] font-bold text-amber-500 uppercase tracking-wider">Próximos (≤ 3 Días)</p>
+          <p id="statAlertas" class="text-2xl font-black text-amber-600 mt-0.5">0</p>
         </div>
-        <div class="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center text-amber-500">
-          <i data-lucide="clock" class="w-5 h-5"></i>
+        <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg">
+          ⏰
         </div>
       </div>
 
-      <!-- Frescos -->
-      <div class="bg-white rounded-2xl p-3.5 border border-slate-100 soft-shadow flex items-center justify-between">
+      <div class="bg-white rounded-2xl p-3.5 shadow-sm border border-slate-200/80 flex justify-between items-center">
         <div>
-          <p class="text-[10px] font-bold uppercase tracking-wider text-emerald-500">Frescos</p>
+          <p class="text-[10px] font-bold text-emerald-500 uppercase tracking-wider">Frescos</p>
           <p id="statFrescos" class="text-2xl font-black text-emerald-600 mt-0.5">0</p>
         </div>
-        <div class="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-500">
-          <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+        <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg">
+          ✅
         </div>
       </div>
 
     </section>
 
-    <!-- BARRA DE BÚSQUEDA Y CHIPS DE FILTRO -->
-    <section class="bg-white rounded-2xl p-3.5 border border-slate-100 soft-shadow space-y-3">
+    <!-- BÚSQUEDA Y CHIPS DE MESA -->
+    <section class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 space-y-3">
       
       <!-- Búsqueda -->
       <div class="relative">
-        <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5"></i>
-        <input type="text" id="buscador" oninput="renderizarRegistros()" placeholder="Buscar dulce por nombre o código barcode/SKU..." class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-medium text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition">
+        <span class="absolute left-3.5 top-3 text-slate-400 text-sm">🔍</span>
+        <input type="text" id="buscador" oninput="renderizarRegistros()" placeholder="Buscar dulce por nombre o código barcode/SKU..." class="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-rose-500 focus:outline-none bg-slate-50/50">
       </div>
 
-      <!-- Filter Chips -->
-      <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pt-1">
-        <span class="text-xs font-bold text-slate-400 whitespace-nowrap flex items-center gap-1 mr-1">
-          <i data-lucide="filter" class="w-3.5 h-3.5"></i>
-          Filtrar Mesa:
-        </span>
-        
-        <div id="contenedorChips" class="flex items-center gap-1.5">
-          <!-- Chips renderizados dinámicamente -->
+      <!-- Chips de Mesas -->
+      <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pt-1 pb-0.5">
+        <span class="text-xs font-bold text-slate-400 shrink-0 mr-1">Filtrar Mesa:</span>
+        <div id="contenedorChips" class="flex items-center gap-2">
+          <!-- Chips inyectados dinámicamente -->
         </div>
       </div>
 
     </section>
 
-    <!-- CONTENEDOR DE TARJETAS / LISTA -->
-    <section id="contenedorLista" class="space-y-3">
-      <!-- Se insertan con JavaScript -->
+    <!-- LISTA DE DULCES -->
+    <section id="contenedorLista" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+      <!-- Tarjetas de dulces -->
     </section>
 
   </main>
 
-  <!-- MODAL / DRAWER FLOTANTE DE REGISTRO DE DULCE -->
-  <div id="modalRegistro" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm hidden flex items-end sm:items-center justify-center transition-opacity">
-    <div class="bg-white w-full sm:max-w-lg rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+  <!-- MODAL FORMULARIO DE REGISTRO -->
+  <div id="modalForm" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4 my-8">
       
-      <!-- Modal Header -->
       <div class="flex justify-between items-center border-b border-slate-100 pb-3">
-        <div class="flex items-center gap-2">
-          <div class="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
-            <i data-lucide="plus" class="w-5 h-5 stroke-[2.5]"></i>
-          </div>
-          <h2 class="font-bold text-base text-slate-800">Registrar Dulce en Exhibición</h2>
-        </div>
-        <button onclick="cerrarModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-600 flex items-center justify-center transition">
-          <i data-lucide="x" class="w-4 h-4"></i>
-        </button>
+        <h2 class="font-bold text-slate-800 text-lg flex items-center gap-2">
+          <span>✨</span> Registrar Dulce en Exhibición
+        </h2>
+        <button onclick="cerrarModalForm()" class="text-slate-400 hover:text-slate-600 text-xl font-bold p-1">×</button>
       </div>
 
-      <!-- Modal Form -->
-      <form id="formDulce" onsubmit="guardarRegistro(event)" class="space-y-3.5">
+      <form id="formDulce" onsubmit="guardarRegistro(event)" class="space-y-3">
         
-        <!-- Nombre -->
         <div>
-          <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Nombre del Dulce</label>
-          <input type="text" id="nombre" required placeholder="Ej. Gomitas de Panda, Chocolates..." class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none">
+          <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Nombre del Dulce</label>
+          <input type="text" id="nombre" required placeholder="Ej. Gomitas de Panda, Chocolates..." class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-rose-500 focus:outline-none bg-slate-50">
         </div>
 
-        <!-- Código / SKU -->
         <div>
-          <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Código o SKU</label>
-          <input type="text" id="codigo" required placeholder="Ej. 12345678" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none">
+          <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Código o SKU</label>
+          <input type="text" id="codigo" required placeholder="Ej. 12345678" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-rose-500 focus:outline-none bg-slate-50">
         </div>
 
-        <!-- Mesa -->
-        <div>
-          <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Mesa / Exhibidor</label>
-          <select id="mesa" required onchange="actualizarDiasRecomendados()" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-700 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none">
-            <option value="Roja">🔴 Mesa Roja (Gomitas / Pulpas - 15 días)</option>
-            <option value="Azul">🔵 Mesa Azul (Caramelos duros - 30 días)</option>
-            <option value="Verde">🟢 Mesa Verde (Botanas / Semillas - 10 días)</option>
-            <option value="Amarilla">🟡 Mesa Amarilla (Chocolates - 30 días)</option>
-            <option value="Naranja">🟠 Mesa Naranja (Chiles / Tamarindos - 20 días)</option>
-            <option value="Morada">🟣 Mesa Morada (Especialidades - 15 días)</option>
-            <option value="Otra">⚪ Otra Mesa / Sección</option>
-          </select>
-        </div>
-
-        <!-- Grid Peso y Días -->
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Peso Colocado</label>
-            <input type="text" id="peso" required placeholder="Ej. 2.5 kg o 500 g" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none">
+            <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Mesa / Exhibidor</label>
+            <select id="mesa" required onchange="actualizarDiasRecomendados()" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-rose-500 focus:outline-none bg-slate-50">
+              <option value="Roja">🔴 Mesa Roja (Gomitas - 15d)</option>
+              <option value="Azul">🔵 Mesa Azul (Caramelos - 30d)</option>
+              <option value="Verde">🟢 Mesa Verde (Botanas - 10d)</option>
+              <option value="Amarilla">🟡 Mesa Amarilla (Chocolates - 30d)</option>
+              <option value="Naranja">🟠 Mesa Naranja (Chiles - 20d)</option>
+              <option value="Morada">🟣 Mesa Morada (Especiales - 15d)</option>
+              <option value="Otra">⚪ Otra Mesa</option>
+            </select>
           </div>
+
           <div>
-            <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Días para Rotación</label>
-            <input type="number" id="diasVida" value="15" min="1" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none">
+            <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Peso Colocado</label>
+            <input type="text" id="peso" required placeholder="Ej. 2.5 kg o 500 g" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-rose-500 focus:outline-none bg-slate-50">
           </div>
         </div>
 
-        <!-- Fecha Ingreso -->
-        <div>
-          <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">Fecha de Exhibición</label>
-          <input type="date" id="fechaIngreso" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-700 focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Fecha de Exhibición</label>
+            <input type="date" id="fechaIngreso" required class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-rose-500 focus:outline-none bg-slate-50">
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Días para Rotación</label>
+            <input type="number" id="diasVida" value="15" min="1" required class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-rose-500 focus:outline-none bg-slate-50">
+          </div>
         </div>
 
-        <!-- Submit Button -->
         <div class="pt-2">
-          <button type="submit" class="w-full bg-rose-600 hover:bg-rose-700 active:scale-[0.99] text-white font-bold py-3 rounded-xl text-xs shadow-lg shadow-rose-600/30 transition flex items-center justify-center gap-2">
-            <i data-lucide="check" class="w-4 h-4"></i>
+          <button type="submit" class="w-full bg-rose-600 hover:bg-rose-700 active:scale-98 text-white font-bold py-3 rounded-xl text-xs transition shadow-lg shadow-rose-200">
             Guardar Dulce en Exhibición
           </button>
         </div>
-
       </form>
+
     </div>
   </div>
 
-  <!-- MODAL CONFIRMACIÓN BORRADO -->
-  <div id="modalConfirmacion" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-xs w-full p-5 text-center space-y-3 shadow-2xl">
-      <div class="w-12 h-12 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center mx-auto">
-        <i data-lucide="alert-triangle" class="w-6 h-6"></i>
+  <!-- MODAL DE CONFIRMACIÓN DE BORRADO -->
+  <div id="modalConfirmacion" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-xs w-full p-6 text-center space-y-3 shadow-2xl">
+      <div class="w-12 h-12 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center text-xl mx-auto">
+        ⚠️
       </div>
-      <h3 id="modalTitulo" class="font-bold text-slate-800 text-base">¿Eliminar dulce?</h3>
+      <h3 id="modalTitulo" class="font-bold text-slate-800 text-base">¿Eliminar registro?</h3>
       <p id="modalMensaje" class="text-xs text-slate-500">Esta acción no se puede deshacer.</p>
       <div class="flex gap-2 pt-2">
-        <button onclick="cerrarModalConfirmacion()" class="flex-1 py-2.5 bg-slate-100 text-slate-600 rounded-xl text-xs font-semibold hover:bg-slate-200 transition">Cancelar</button>
-        <button id="btnConfirmarAccion" class="flex-1 py-2.5 bg-rose-600 text-white rounded-xl text-xs font-bold hover:bg-rose-700 transition">Eliminar</button>
+        <button onclick="cerrarModalConfirmacion()" class="flex-1 py-2.5 border border-slate-200 text-slate-600 rounded-xl text-xs font-bold hover:bg-slate-50">Cancelar</button>
+        <button id="btnConfirmarAccion" class="flex-1 py-2.5 bg-rose-600 text-white rounded-xl text-xs font-bold hover:bg-rose-700 shadow-md shadow-rose-100">Eliminar</button>
       </div>
     </div>
   </div>
 
-  <!-- LÓGICA DE LA APLICACIÓN -->
+  <!-- LÓGICA JAVASCRIPT -->
   <script>
     let registros = JSON.parse(localStorage.getItem('pick_mix_dulces')) || [];
-    let filtroMesaActual = 'TODAS';
+    let mesaSeleccionada = 'TODAS';
     let idEliminar = null;
     let vaciarTodoFlag = false;
+
+    const mesasConfig = [
+      { id: 'TODAS', nombre: 'Todas', colorBg: 'bg-slate-900 text-white', dot: '' },
+      { id: 'Roja', nombre: 'Roja', colorBg: 'bg-rose-50 text-rose-700 border-rose-200', dot: '🔴' },
+      { id: 'Azul', nombre: 'Azul', colorBg: 'bg-sky-50 text-sky-700 border-sky-200', dot: '🔵' },
+      { id: 'Verde', nombre: 'Verde', colorBg: 'bg-emerald-50 text-emerald-700 border-emerald-200', dot: '🟢' },
+      { id: 'Amarilla', nombre: 'Amarilla', colorBg: 'bg-amber-50 text-amber-700 border-amber-200', dot: '🟡' },
+      { id: 'Naranja', nombre: 'Naranja', colorBg: 'bg-orange-50 text-orange-700 border-orange-200', dot: '🟠' },
+      { id: 'Morada', nombre: 'Morada', colorBg: 'bg-purple-50 text-purple-700 border-purple-200', dot: '🟣' },
+      { id: 'Otra', nombre: 'Otras', colorBg: 'bg-slate-50 text-slate-700 border-slate-200', dot: '⚪' }
+    ];
 
     const reglasMesas = {
       'Roja': 15, 'Azul': 30, 'Verde': 10, 'Amarilla': 30, 'Naranja': 20, 'Morada': 15, 'Otra': 15
     };
-
-    const configuracionMesas = [
-      { id: 'TODAS', nombre: 'Todas', color: 'bg-slate-900 text-white border-slate-900' },
-      { id: 'Roja', nombre: '🔴 Roja', color: 'bg-rose-50 text-rose-700 border-rose-200' },
-      { id: 'Azul', nombre: '🔵 Azul', color: 'bg-sky-50 text-sky-700 border-sky-200' },
-      { id: 'Verde', nombre: '🟢 Verde', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
-      { id: 'Amarilla', nombre: '🟡 Amarilla', color: 'bg-amber-50 text-amber-700 border-amber-200' },
-      { id: 'Naranja', nombre: '🟠 Naranja', color: 'bg-orange-50 text-orange-700 border-orange-200' },
-      { id: 'Morada', nombre: '🟣 Morada', color: 'bg-purple-50 text-purple-700 border-purple-200' },
-      { id: 'Otra', nombre: '⚪ Otra', color: 'bg-slate-100 text-slate-700 border-slate-200' }
-    ];
 
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('fechaIngreso').value = new Date().toISOString().split('T')[0];
       actualizarDiasRecomendados();
       renderizarChips();
       renderizarRegistros();
-      lucide.createIcons();
     });
+
+    function renderizarChips() {
+      const contenedor = document.getElementById('contenedorChips');
+      contenedor.innerHTML = '';
+
+      mesasConfig.forEach(m => {
+        const esActivo = mesaSeleccionada === m.id;
+        const btn = document.createElement('button');
+        btn.onclick = () => { mesaSeleccionada = m.id; renderizarChips(); renderizarRegistros(); };
+        
+        btn.className = `shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold transition border flex items-center gap-1.5 ${
+          esActivo 
+            ? 'bg-slate-900 text-white border-slate-900 shadow-md' 
+            : `${m.colorBg} opacity-80 hover:opacity-100`
+        }`;
+        
+        btn.innerHTML = `${m.dot} <span>${m.nombre}</span>`;
+        contenedor.appendChild(btn);
+      });
+    }
 
     function actualizarDiasRecomendados() {
       const mesa = document.getElementById('mesa').value;
       document.getElementById('diasVida').value = reglasMesas[mesa] || 15;
     }
 
-    function renderizarChips() {
-      const contenedor = document.getElementById('contenedorChips');
-      contenedor.innerHTML = '';
-
-      configuracionMesas.forEach(m => {
-        const activo = filtroMesaActual === m.id;
-        const btn = document.createElement('button');
-        btn.onclick = () => {
-          filtroMesaActual = m.id;
-          renderizarChips();
-          renderizarRegistros();
-        };
-
-        btn.className = `px-3 py-1.5 rounded-xl text-xs font-bold border transition flex items-center gap-1 whitespace-nowrap ${
-          activo 
-            ? 'bg-rose-600 text-white border-rose-600 shadow-md shadow-rose-600/20' 
-            : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
-        }`;
-        btn.textContent = m.nombre;
-        contenedor.appendChild(btn);
-      });
+    function abrirModalForm() {
+      document.getElementById('modalForm').classList.remove('hidden');
     }
 
-    function abrirModal() {
-      document.getElementById('modalRegistro').classList.remove('hidden');
-    }
-
-    function cerrarModal() {
-      document.getElementById('modalRegistro').classList.add('hidden');
+    function cerrarModalForm() {
+      document.getElementById('modalForm').classList.add('hidden');
     }
 
     function guardarRegistro(e) {
       e.preventDefault();
-
       const nombre = document.getElementById('nombre').value.trim();
       const codigo = document.getElementById('codigo').value.trim();
       const mesa = document.getElementById('mesa').value;
@@ -352,9 +308,8 @@
 
       guardarEnLocalStorage();
       renderizarRegistros();
-      cerrarModal();
+      cerrarModalForm();
 
-      // Reset form
       document.getElementById('nombre').value = '';
       document.getElementById('codigo').value = '';
       document.getElementById('peso').value = '';
@@ -366,50 +321,31 @@
       const limite = new Date(fechaCambio + 'T00:00:00');
       const diff = Math.ceil((limite - hoy) / (1000 * 60 * 60 * 24));
 
-      if (diff < 0) {
-        return { tipo: 'VENCIDO', colorBarra: 'bg-rose-500', badge: 'bg-rose-100 text-rose-700 border-rose-200', texto: `Vencido (${Math.abs(diff)}d)` };
-      } else if (diff === 0) {
-        return { tipo: 'HOY', colorBarra: 'bg-rose-500', badge: 'bg-rose-100 text-rose-700 border-rose-200', texto: '¡Cambiar HOY!' };
-      } else if (diff <= 3) {
-        return { tipo: 'PROXIMO', colorBarra: 'bg-amber-500', badge: 'bg-amber-100 text-amber-700 border-amber-200', texto: `Próximo (${diff}d)` };
-      } else {
-        return { tipo: 'FRESCO', colorBarra: 'bg-emerald-500', badge: 'bg-emerald-100 text-emerald-700 border-emerald-200', texto: `Fresco (${diff}d)` };
-      }
+      if (diff < 0) return { key: 'VENCIDOS', mensaje: `Vencido (${Math.abs(diff)}d)`, colorBarra: 'bg-rose-500', badge: 'bg-rose-100 text-rose-700' };
+      if (diff === 0) return { key: 'VENCIDOS', mensaje: '¡Cambiar HOY!', colorBarra: 'bg-rose-500', badge: 'bg-rose-100 text-rose-700' };
+      if (diff <= 3) return { key: 'ALERTAS', mensaje: `Cambio en ${diff}d`, colorBarra: 'bg-amber-500', badge: 'bg-amber-100 text-amber-700' };
+      return { key: 'FRESCOS', mensaje: `Fresco (${diff}d)`, colorBarra: 'bg-emerald-500', badge: 'bg-emerald-100 text-emerald-700' };
     }
 
-    function actualizarEstadisticas() {
-      let vencidos = 0;
-      let proximos = 0;
-      let frescos = 0;
+    function actualizarDashboard() {
+      let vencidos = 0, alertas = 0, frescos = 0;
 
       registros.forEach(r => {
-        const sem = obtenerEstadoSemaforo(r.fechaCambio);
-        if (sem.tipo === 'VENCIDO' || sem.tipo === 'HOY') vencidos++;
-        else if (sem.tipo === 'PROXIMO') proximos++;
+        const status = obtenerEstadoSemaforo(r.fechaCambio);
+        if (status.key === 'VENCIDOS') vencidos++;
+        else if (status.key === 'ALERTAS') alertas++;
         else frescos++;
       });
 
       document.getElementById('statTotal').textContent = registros.length;
       document.getElementById('statVencidos').textContent = vencidos;
-      document.getElementById('statProximos').textContent = proximos;
+      document.getElementById('statAlertas').textContent = alertas;
       document.getElementById('statFrescos').textContent = frescos;
     }
 
-    function obtenerBadgeMesa(mesa) {
-      const badges = {
-        'Roja': 'bg-rose-50 text-rose-700 border-rose-200',
-        'Azul': 'bg-sky-50 text-sky-700 border-sky-200',
-        'Verde': 'bg-emerald-50 text-emerald-700 border-emerald-200',
-        'Amarilla': 'bg-amber-50 text-amber-700 border-amber-200',
-        'Naranja': 'bg-orange-50 text-orange-700 border-orange-200',
-        'Morada': 'bg-purple-50 text-purple-700 border-purple-200',
-        'Otra': 'bg-slate-100 text-slate-700 border-slate-200'
-      };
-      return badges[mesa] || badges['Otra'];
-    }
-
     function renderizarRegistros() {
-      actualizarEstadisticas();
+      actualizarDashboard();
+
       const contenedor = document.getElementById('contenedorLista');
       const busqueda = document.getElementById('buscador').value.toLowerCase();
 
@@ -417,90 +353,80 @@
 
       const filtrados = registros.filter(r => {
         const matchSearch = r.nombre.toLowerCase().includes(busqueda) || r.codigo.toLowerCase().includes(busqueda);
-        const matchMesa = filtroMesaActual === 'TODAS' || r.mesa === filtroMesaActual;
+        const matchMesa = mesaSeleccionada === 'TODAS' || r.mesa === mesaSeleccionada;
         return matchSearch && matchMesa;
       });
 
-      // Estado Vacío (Empty State)
       if (filtrados.length === 0) {
         contenedor.innerHTML = `
-          <div class="bg-white rounded-3xl p-8 text-center border border-dashed border-slate-200 soft-shadow my-4 space-y-3">
-            <div class="w-16 h-16 bg-rose-50 text-rose-400 rounded-full flex items-center justify-center mx-auto">
-              <i data-lucide="cookie" class="w-8 h-8"></i>
-            </div>
-            <div class="space-y-1">
-              <p class="font-bold text-slate-700 text-sm">No hay dulces en exhibición con este filtro</p>
-              <p class="text-xs text-slate-400">Ingresa un nuevo registro o cambia los filtros de búsqueda.</p>
-            </div>
-            <button onclick="abrirModal()" class="inline-flex items-center gap-1.5 bg-rose-600 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-md shadow-rose-600/20 active:scale-95 transition">
-              <i data-lucide="plus" class="w-4 h-4"></i>
-              <span>Añadir Dulce</span>
+          <div class="col-span-full bg-white rounded-3xl p-8 text-center border border-dashed border-slate-200 my-4 space-y-3">
+            <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center text-3xl mx-auto">🍪</div>
+            <p class="text-sm font-bold text-slate-700">No hay dulces en exhibición con este filtro</p>
+            <p class="text-xs text-slate-400">Ingresa un nuevo registro o cambia los filtros de búsqueda.</p>
+            <button onclick="abrirModalForm()" class="mt-2 bg-rose-600 text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow-md">
+              + Añadir Dulce
             </button>
           </div>
         `;
-        lucide.createIcons();
         return;
       }
 
       filtrados.forEach(r => {
         const semaforo = obtenerEstadoSemaforo(r.fechaCambio);
-        const badgeMesa = obtenerBadgeMesa(r.mesa);
+        const configMesa = mesasConfig.find(m => m.id === r.mesa) || mesasConfig[7];
 
         const card = document.createElement('div');
-        card.className = "bg-white rounded-2xl p-4 border border-slate-100 soft-shadow relative overflow-hidden flex flex-col justify-between space-y-3";
+        card.className = "bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 relative overflow-hidden flex flex-col justify-between";
         card.innerHTML = `
           <div class="absolute top-0 left-0 w-1.5 h-full ${semaforo.colorBarra}"></div>
-
+          
           <div>
-            <div class="flex justify-between items-start gap-2 pl-2">
+            <div class="flex justify-between items-start gap-2 mb-2 pl-2">
               <div>
-                <span class="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full border ${badgeMesa}">
-                  MESA ${r.mesa.toUpperCase()}
+                <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full border ${configMesa.colorBg}">
+                  ${configMesa.dot} Mesa ${r.mesa}
                 </span>
-                <h3 class="font-bold text-slate-800 text-base mt-1.5 leading-snug">${r.nombre}</h3>
+                <h3 class="font-extrabold text-slate-800 text-base mt-1.5 leading-tight">${r.nombre}</h3>
                 <p class="text-[11px] text-slate-400 font-mono mt-0.5">SKU: ${r.codigo}</p>
               </div>
 
-              <span class="text-[10px] font-bold px-2.5 py-1 rounded-xl border ${semaforo.badge} whitespace-nowrap">
-                ${semaforo.texto}
+              <span class="text-[10px] font-bold px-2.5 py-1 rounded-lg ${semaforo.badge}">
+                ${semaforo.mensaje}
               </span>
             </div>
 
-            <div class="grid grid-cols-2 gap-2 text-xs bg-slate-50/80 p-2.5 rounded-xl mt-3 ml-2 border border-slate-100">
+            <div class="grid grid-cols-2 gap-2 text-[11px] bg-slate-50 p-2.5 rounded-xl my-3 pl-3 border border-slate-100">
               <div>
-                <span class="text-slate-400 text-[10px] block font-semibold">Exhibido el:</span>
+                <span class="text-slate-400 block">Exhibido el:</span>
                 <span class="font-bold text-slate-700">${r.fechaIngreso}</span>
               </div>
               <div>
-                <span class="text-slate-400 text-[10px] block font-semibold">Fecha Cambio:</span>
+                <span class="text-slate-400 block">Fecha Cambio:</span>
                 <span class="font-bold text-slate-700">${r.fechaCambio}</span>
               </div>
               <div>
-                <span class="text-slate-400 text-[10px] block font-semibold">Peso Colocado:</span>
+                <span class="text-slate-400 block">Peso:</span>
                 <span class="font-bold text-slate-700">${r.peso}</span>
               </div>
               <div>
-                <span class="text-slate-400 text-[10px] block font-semibold">Rotación:</span>
+                <span class="text-slate-400 block">Vida útil:</span>
                 <span class="font-bold text-slate-700">${r.diasVida} días</span>
               </div>
             </div>
           </div>
 
           <div class="flex justify-between items-center pt-2 border-t border-slate-100 pl-2">
-            <button onclick="rotarHoy(${r.id})" class="text-xs text-rose-600 hover:text-rose-700 font-bold flex items-center gap-1 active:scale-95 transition">
-              <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i>
-              <span>Rotar Hoy</span>
+            <button onclick="rotarHoy(${r.id})" class="text-xs text-rose-600 hover:text-rose-700 font-bold flex items-center gap-1">
+              🔄 Rotar Hoy
             </button>
 
-            <button onclick="confirmarEliminarUnico(${r.id}, '${r.nombre}')" class="text-slate-300 hover:text-rose-500 p-1 active:scale-95 transition">
-              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            <button onclick="confirmarEliminarUnico(${r.id}, '${r.nombre}')" class="text-xs text-slate-300 hover:text-rose-600 p-1 transition">
+              🗑️
             </button>
           </div>
         `;
         contenedor.appendChild(card);
       });
-
-      lucide.createIcons();
     }
 
     function rotarHoy(id) {
@@ -521,17 +447,25 @@
       idEliminar = id;
       vaciarTodoFlag = false;
       document.getElementById('modalTitulo').textContent = '¿Eliminar dulce?';
-      document.getElementById('modalMensaje').textContent = `Se eliminará "${nombre}" de la lista.`;
+      document.getElementById('modalMensaje').textContent = `Se borrará "${nombre}".`;
       document.getElementById('modalConfirmacion').classList.remove('hidden');
     }
 
     function confirmarVaciarTodo() {
       if (registros.length === 0) return;
       vaciarTodoFlag = true;
-      document.getElementById('modalTitulo').textContent = '¿Vaciar lista completa?';
-      document.getElementById('modalMensaje').textContent = 'Se borrarán TODOS los dulces registrados.';
+      document.getElementById('modalTitulo').textContent = '¿Vaciar lista?';
+      document.getElementById('modalMensaje').textContent = 'Se eliminarán TODOS los registros guardados.';
       document.getElementById('modalConfirmacion').classList.remove('hidden');
     }
+
+    document.getElementById('btnConfirmarAccion').addEventListener('click', () => {
+      if (vaciarTodoFlag) registros = [];
+      else if (idEliminar) registros = registros.filter(r => r.id !== idEliminar);
+      guardarEnLocalStorage();
+      renderizarRegistros();
+      cerrarModalConfirmacion();
+    });
 
     function cerrarModalConfirmacion() {
       idEliminar = null;
@@ -539,40 +473,24 @@
       document.getElementById('modalConfirmacion').classList.add('hidden');
     }
 
-    document.getElementById('btnConfirmarAccion').addEventListener('click', () => {
-      if (vaciarTodoFlag) registros = [];
-      else if (idEliminar) registros = registros.filter(r => r.id !== idEliminar);
-
-      guardarEnLocalStorage();
-      renderizarRegistros();
-      cerrarModalConfirmacion();
-    });
-
     function guardarEnLocalStorage() {
       localStorage.setItem('pick_mix_dulces', JSON.stringify(registros));
     }
 
     function exportarCSV() {
-      if (registros.length === 0) return alert('No hay datos para exportar.');
+      if (registros.length === 0) return alert('No hay registros para exportar.');
       let csv = 'Nombre,Codigo SKU,Mesa,Peso,Fecha Ingreso,Dias Vida,Fecha Cambio,Estado\n';
       registros.forEach(r => {
-        const sem = obtenerEstadoSemaforo(r.fechaCambio);
-        csv += `"${r.nombre}","${r.codigo}","${r.mesa}","${r.peso}","${r.fechaIngreso}",${r.diasVida},"${r.fechaCambio}","${sem.tipo}"\n`;
+        const semaforo = obtenerEstadoSemaforo(r.fechaCambio);
+        csv += `"${r.nombre}","${r.codigo}","${r.mesa}","${r.peso}","${r.fechaIngreso}",${r.diasVida},"${r.fechaCambio}","${semaforo.key}"\n`;
       });
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `Pick_And_Mix_Liverpool_${new Date().toISOString().split('T')[0]}.csv`;
+      a.download = `Reporte_Pick_Mix_${new Date().toISOString().split('T')[0]}.csv`;
       a.click();
     }
   </script>
 </body>
 </html>
-```
-
-### Instrucciones rápidas para actualizar:
-1. Reemplaza todo el código del archivo `index.html` en GitHub por este.
-2. Guarda los cambios (**Commit changes**).
-3. Borra la caché del navegador en tu celular o abre una pestaña de incógnito para ver la nueva versión.
-```
