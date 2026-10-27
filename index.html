@@ -183,11 +183,10 @@
             <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Mesa / Exhibidor</label>
             <select id="mesa" required onchange="actualizarDiasRecomendados()" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-rose-500 focus:outline-none bg-slate-50">
               <option value="Roja">🔴 Mesa Roja (Gomitas - 15d)</option>
-              <option value="Azul">🔵 Mesa Azul (Gomas enchiladas 
-            - 30d)</option>
-              <option value="Verde">🟢 Mesa Verde (Chocolate - 10d)</option>
-              <option value="Amarilla">🟡 Mesa Amarilla (Botanas - 30d)</option>
-              <option value="Naranja">🟠 Mesa Naranja (Frutas  - 20d)</option>
+              <option value="Azul">🔵 Mesa Azul (Caramelos - 30d)</option>
+              <option value="Verde">🟢 Mesa Verde (Botanas - 10d)</option>
+              <option value="Amarilla">🟡 Mesa Amarilla (Chocolates - 30d)</option>
+              <option value="Naranja">🟠 Mesa Naranja (Chiles - 20d)</option>
               <option value="Morada">🟣 Mesa Morada (Especiales - 15d)</option>
               <option value="Otra">⚪ Otra Mesa</option>
             </select>
@@ -206,7 +205,7 @@
           </div>
 
           <div>
-            <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Días para Rotación</label>
+            <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Días de Vida Útil</label>
             <input type="number" id="diasVida" value="15" min="1" required class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-rose-500 focus:outline-none bg-slate-50">
           </div>
         </div>
@@ -227,7 +226,6 @@
     import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getDatabase, ref, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-    // Tu configuración de Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyCIME4E2vjDO8cAzxvcbzpaMHwPNtFK7oI",
       authDomain: "pickandmix-4ac27.firebaseapp.com",
@@ -260,7 +258,6 @@
       'Roja': 15, 'Azul': 30, 'Verde': 10, 'Amarilla': 30, 'Naranja': 20, 'Morada': 15, 'Otra': 15
     };
 
-    // Control de Sesión
     onAuthStateChanged(auth, (user) => {
       if (user) {
         document.getElementById('seccionLogin').classList.add('hidden');
@@ -284,7 +281,7 @@
       err.classList.add('hidden');
 
       signInWithEmailAndPassword(auth, email, pass)
-        .catch((error) => {
+        .catch(() => {
           btn.disabled = false;
           btn.textContent = "Ingresar a la Plataforma";
           err.textContent = "Correo o contraseña incorrectos.";
@@ -294,7 +291,6 @@
 
     window.cerrarSesion = () => signOut(auth);
 
-    // Escuchar cambios en tiempo real en la nube
     function escucharBaseDeDatos() {
       const dbRef = ref(db, 'dulces');
       onValue(dbRef, (snapshot) => {
@@ -351,7 +347,6 @@
       }
     };
 
-    // Renderizado
     window.renderizarChips = () => {
       const contenedor = document.getElementById('contenedorChips');
       contenedor.innerHTML = '';
@@ -413,9 +408,9 @@
 
             <div class="grid grid-cols-2 gap-2 text-[11px] bg-slate-50 p-2.5 rounded-xl my-3 pl-3 border border-slate-100">
               <div><span class="text-slate-400 block">Exhibido:</span><span class="font-bold text-slate-700">${r.fechaIngreso}</span></div>
-              <div><span class="text-slate-400 block">Cambio:</span><span class="font-bold text-slate-700">${r.fechaCambio}</span></div>
+              <div><span class="text-slate-400 block">Cambio límite:</span><span class="font-bold text-slate-700">${r.fechaCambio}</span></div>
               <div><span class="text-slate-400 block">Peso:</span><span class="font-bold text-slate-700">${r.peso}</span></div>
-              <div><span class="text-slate-400 block">Vida útil:</span><span class="font-bold text-slate-700">${r.diasVida}d</span></div>
+              <div><span class="text-slate-400 block">Cuenta Regresiva:</span><span class="font-black ${semaforo.textClass}">${semaforo.textoDias}</span></div>
             </div>
           </div>
 
@@ -434,10 +429,44 @@
       const limite = new Date(fechaCambio + 'T00:00:00');
       const diff = Math.ceil((limite - hoy) / (1000 * 60 * 60 * 24));
 
-      if (diff < 0) return { key: 'VENCIDOS', mensaje: `Vencido (${Math.abs(diff)}d)`, colorBarra: 'bg-rose-500', badge: 'bg-rose-100 text-rose-700' };
-      if (diff === 0) return { key: 'VENCIDOS', mensaje: '¡Cambiar HOY!', colorBarra: 'bg-rose-500', badge: 'bg-rose-100 text-rose-700' };
-      if (diff <= 3) return { key: 'ALERTAS', mensaje: `Cambio en ${diff}d`, colorBarra: 'bg-amber-500', badge: 'bg-amber-100 text-amber-700' };
-      return { key: 'FRESCOS', mensaje: `Fresco (${diff}d)`, colorBarra: 'bg-emerald-500', badge: 'bg-emerald-100 text-emerald-700' };
+      if (diff < 0) {
+        return { 
+          key: 'VENCIDOS', 
+          mensaje: `Vencido (${Math.abs(diff)}d)`, 
+          colorBarra: 'bg-rose-500', 
+          badge: 'bg-rose-100 text-rose-700',
+          textoDias: `Vencido hace ${Math.abs(diff)}d`,
+          textClass: 'text-rose-600'
+        };
+      }
+      if (diff === 0) {
+        return { 
+          key: 'VENCIDOS', 
+          mensaje: '¡Cambiar HOY!', 
+          colorBarra: 'bg-rose-500', 
+          badge: 'bg-rose-100 text-rose-700',
+          textoDias: '¡Vence HOY!',
+          textClass: 'text-rose-600'
+        };
+      }
+      if (diff <= 3) {
+        return { 
+          key: 'ALERTAS', 
+          mensaje: `Cambio en ${diff}d`, 
+          colorBarra: 'bg-amber-500', 
+          badge: 'bg-amber-100 text-amber-700',
+          textoDias: `Quedan ${diff} días`,
+          textClass: 'text-amber-600'
+        };
+      }
+      return { 
+        key: 'FRESCOS', 
+        mensaje: `Fresco (${diff}d)`, 
+        colorBarra: 'bg-emerald-500', 
+        badge: 'bg-emerald-100 text-emerald-700',
+        textoDias: `Quedan ${diff} días`,
+        textClass: 'text-emerald-600'
+      };
     }
 
     function actualizarDashboard() {
@@ -463,7 +492,7 @@
 
     window.exportarCSV = () => {
       if (window.registros.length === 0) return alert('No hay registros para exportar.');
-      let csv = 'Nombre,Codigo SKU,Mesa,Peso,Fecha Ingreso,Dias Vida,Fecha Cambio,Estado\n';
+      let csv = 'Nombre,Codigo SKU,Mesa,Peso,Fecha Ingreso,Dias Vida Total,Fecha Cambio Limite,Estado\n';
       window.registros.forEach(r => {
         const semaforo = obtenerEstadoSemaforo(r.fechaCambio);
         csv += `"${r.nombre}","${r.codigo}","${r.mesa}","${r.peso}","${r.fechaIngreso}",${r.diasVida},"${r.fechaCambio}","${semaforo.key}"\n`;
