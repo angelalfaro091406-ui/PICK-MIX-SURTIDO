@@ -30,7 +30,7 @@
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
-<body class="pb-16 min-h-screen antialiased">
+<body class="pb-20 min-h-screen antialiased">
 
   <!-- PANTALLA DE LOGIN -->
   <div id="seccionLogin" class="fixed inset-0 bg-slate-900/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
@@ -86,11 +86,9 @@
           <button onclick="exportarCSV()" class="bg-white/15 hover:bg-white/25 text-white text-xs font-semibold px-3 py-2 rounded-xl border border-white/20 flex items-center gap-1.5 transition">
             📊 <span>CSV</span>
           </button>
-
           <button onclick="cerrarSesion()" class="bg-white/15 hover:bg-white/25 text-white text-xs font-semibold px-3 py-2 rounded-xl border border-white/20 transition">
             🚪 Salir
           </button>
-
           <button onclick="abrirModalForm()" class="bg-white text-rose-600 hover:bg-rose-50 font-bold text-xs px-3.5 py-2 rounded-xl shadow-md flex items-center gap-1.5 transition">
             ➕ <span>Registrar Dulce</span>
           </button>
@@ -99,7 +97,20 @@
       </div>
     </header>
 
-    <main class="max-w-3xl mx-auto p-4 space-y-5">
+    <!-- NAVEGACIÓN DE PESTAÑAS (CONTROL VS CATÁLOGO) -->
+    <nav class="max-w-3xl mx-auto px-4 pt-4">
+      <div class="flex bg-slate-200/70 p-1 rounded-2xl">
+        <button id="tabBtnControl" onclick="cambiarPestana('control')" class="flex-1 py-2.5 rounded-xl text-xs font-extrabold transition shadow-sm bg-white text-rose-600">
+          📦 Control y Semáforo
+        </button>
+        <button id="tabBtnCatalogo" onclick="cambiarPestana('catalogo')" class="flex-1 py-2.5 rounded-xl text-xs font-extrabold transition text-slate-600 hover:text-slate-900">
+          📖 Catálogo Digital
+        </button>
+      </div>
+    </nav>
+
+    <!-- SECCIÓN 1: CONTROL Y SEMÁFORO -->
+    <main id="seccionControl" class="max-w-3xl mx-auto p-4 space-y-5">
 
       <!-- DASHBOARD RESUMEN -->
       <section class="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -154,6 +165,23 @@
 
     </main>
 
+    <!-- SECCIÓN 2: CATÁLOGO DIGITAL TIPO LIBRO -->
+    <main id="seccionCatalogo" class="max-w-3xl mx-auto p-4 space-y-4 hidden">
+      <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 space-y-3">
+        <div>
+          <h2 class="font-extrabold text-slate-800 text-base">📖 Catálogo Oficial de Dulcería</h2>
+          <p class="text-xs text-slate-400 mt-0.5">Consulta rápida de SKUs, precios, proveedores e imágenes oficiales.</p>
+        </div>
+        <div class="relative">
+          <span class="absolute left-3.5 top-3 text-slate-400 text-sm">🔍</span>
+          <input type="text" id="buscadorCatalogo" oninput="renderizarCatalogo()" placeholder="Buscar en el catálogo por nombre, SKU o proveedor..." class="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-rose-500 focus:outline-none bg-slate-50/50">
+        </div>
+      </div>
+
+      <!-- LISTA DE PRODUCTOS DEL CATÁLOGO -->
+      <section id="contenedorCatalogoLista" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5"></section>
+    </main>
+
   </div>
 
   <!-- MODAL FORMULARIO DE REGISTRO -->
@@ -170,12 +198,12 @@
       <form id="formDulce" onsubmit="guardarRegistro(event)" class="space-y-3">
         <div>
           <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Nombre del Dulce</label>
-          <input type="text" id="nombre" required placeholder="Ej. Gomitas de Panda" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-rose-500 focus:outline-none bg-slate-50">
+          <input type="text" id="nombre" required placeholder="Ej. Esfera Lindor Leche" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-rose-500 focus:outline-none bg-slate-50">
         </div>
 
         <div>
           <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Código o SKU</label>
-          <input type="text" id="codigo" required placeholder="Ej. 12345678" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-rose-500 focus:outline-none bg-slate-50">
+          <input type="text" id="codigo" required placeholder="Ej. 1037199628" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-rose-500 focus:outline-none bg-slate-50">
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -194,7 +222,7 @@
 
           <div>
             <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Peso Colocado</label>
-            <input type="text" id="peso" required placeholder="Ej. 2.5 kg o 500 g" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-rose-500 focus:outline-none bg-slate-50">
+            <input type="text" id="peso" required placeholder="Ej. 2 kg o 500 g" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-rose-500 focus:outline-none bg-slate-50">
           </div>
         </div>
 
@@ -206,7 +234,7 @@
 
           <div>
             <label class="block text-[11px] font-bold text-slate-500 uppercase mb-1">Días de Vida Útil</label>
-            <input type="number" id="diasVida" value="15" min="1" required class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-rose-500 focus:outline-none bg-slate-50">
+            <input type="number" id="diasVida" value="30" min="1" required class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-rose-500 focus:outline-none bg-slate-50">
           </div>
         </div>
 
@@ -220,7 +248,7 @@
     </div>
   </div>
 
-  <!-- FIREBASE LIBRARIES -->
+  <!-- FIREBASE & LOGICA -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -243,6 +271,19 @@
     window.registros = [];
     window.mesaSeleccionada = 'TODAS';
 
+    // BASE DE DATOS DEL CATÁLOGO DIGITAL (Extraído de tu formato de Excel)
+    const catalogoProductos = [
+      { sku: "1006695333", nombre: "Esfera Lindor Leche 2kg", mesa: "Amarilla", proveedor: "Lindt & Sprüngli", precio: 1790.00, img: "https://images.unsplash.com/photo-1549007994-cb92caebd54b?w=400&auto=format&fit=crop&q=60" },
+      { sku: "1006695341", nombre: "Esfera Lindor Amargo 2kg", mesa: "Amarilla", proveedor: "Lindt & Sprüngli", precio: 1790.00, img: "https://images.unsplash.com/photo-1511381939415-e44015466834?w=400&auto=format&fit=crop&q=60" },
+      { sku: "1006695350", nombre: "Esfera Lindor Blanco 2kg", mesa: "Amarilla", proveedor: "Lindt & Sprüngli", precio: 1790.00, img: "https://images.unsplash.com/photo-1582293041000-430263f3554e?w=400&auto=format&fit=crop&q=60" },
+      { sku: "1020674489", nombre: "Esfera Lindor Doble Choco 2kg", mesa: "Amarilla", proveedor: "Lindt & Sprüngli", precio: 1790.00, img: "https://images.unsplash.com/photo-1606312619070-d48b4c652a52?w=400&auto=format&fit=crop&q=60" },
+      { sku: "1020674497", nombre: "Esfera Lindor Caramel 2kg", mesa: "Amarilla", proveedor: "Lindt & Sprüngli", precio: 1790.00, img: "https://images.unsplash.com/photo-1575372582400-481304752523?w=400&auto=format&fit=crop&q=60" },
+      { sku: "1020674519", nombre: "Esfera Lindor Cacao 60% 2kg", mesa: "Amarilla", proveedor: "Lindt & Sprüngli", precio: 1790.00, img: "https://images.unsplash.com/photo-1548848221-0c2eefb5a3dd?w=400&auto=format&fit=crop&q=60" },
+      { sku: "1031613929", nombre: "Esfera Lindor Coco 2kg", mesa: "Amarilla", proveedor: "Lindt & Sprüngli", precio: 1790.00, img: "https://images.unsplash.com/photo-1526047932273-341f2a7631f9?w=400&auto=format&fit=crop&q=60" },
+      { sku: "1092236567", nombre: "Esfera Lindor Fresas c/Crema", mesa: "Amarilla", proveedor: "Lindt & Sprüngli", precio: 1790.00, img: "https://images.unsplash.com/photo-1534483509719-595746b00f3f?w=400&auto=format&fit=crop&q=60" },
+      { sku: "1134495061", nombre: "Lindor Fudge Chocolate Granel", mesa: "Amarilla", proveedor: "Lindt & Sprüngli", precio: 749.00, img: "https://images.unsplash.com/photo-1548907040-4baa42d10919?w=400&auto=format&fit=crop&q=60" }
+    ];
+
     const mesasConfig = [
       { id: 'TODAS', nombre: 'Todas', colorBg: 'bg-slate-900 text-white', dot: '' },
       { id: 'Roja', nombre: 'Roja', colorBg: 'bg-rose-50 text-rose-700 border-rose-200', dot: '🔴' },
@@ -263,6 +304,7 @@
         document.getElementById('seccionLogin').classList.add('hidden');
         document.getElementById('appContenido').classList.remove('hidden');
         escucharBaseDeDatos();
+        renderizarCatalogo();
       } else {
         document.getElementById('seccionLogin').classList.remove('hidden');
         document.getElementById('appContenido').classList.add('hidden');
@@ -290,6 +332,27 @@
     };
 
     window.cerrarSesion = () => signOut(auth);
+
+    // CAMBIO DE PESTAÑAS
+    window.cambiarPestana = (pestana) => {
+      const btnControl = document.getElementById('tabBtnControl');
+      const btnCatalogo = document.getElementById('tabBtnCatalogo');
+      const secControl = document.getElementById('seccionControl');
+      const secCatalogo = document.getElementById('seccionCatalogo');
+
+      if (pestana === 'control') {
+        btnControl.className = "flex-1 py-2.5 rounded-xl text-xs font-extrabold transition shadow-sm bg-white text-rose-600";
+        btnCatalogo.className = "flex-1 py-2.5 rounded-xl text-xs font-extrabold transition text-slate-600 hover:text-slate-900";
+        secControl.classList.remove('hidden');
+        secCatalogo.classList.add('hidden');
+      } else {
+        btnCatalogo.className = "flex-1 py-2.5 rounded-xl text-xs font-extrabold transition shadow-sm bg-white text-rose-600";
+        btnControl.className = "flex-1 py-2.5 rounded-xl text-xs font-extrabold transition text-slate-600 hover:text-slate-900";
+        secCatalogo.classList.remove('hidden');
+        secControl.classList.add('hidden');
+        renderizarCatalogo();
+      }
+    };
 
     function escucharBaseDeDatos() {
       const dbRef = ref(db, 'dulces');
@@ -424,49 +487,63 @@
       });
     };
 
+    // RENDERIZAR EL CATÁLOGO DIGITAL TIPO LIBRO
+    window.renderizarCatalogo = () => {
+      const contenedor = document.getElementById('contenedorCatalogoLista');
+      const busqueda = document.getElementById('buscadorCatalogo').value.toLowerCase();
+      contenedor.innerHTML = '';
+
+      const filtrados = catalogoProductos.filter(p => {
+        return p.nombre.toLowerCase().includes(busqueda) || 
+               p.sku.toLowerCase().includes(busqueda) || 
+               p.proveedor.toLowerCase().includes(busqueda);
+      });
+
+      if (filtrados.length === 0) {
+        contenedor.innerHTML = `
+          <div class="col-span-full bg-white rounded-3xl p-8 text-center border border-dashed border-slate-200 my-4 space-y-2">
+            <p class="text-sm font-bold text-slate-700">No se encontró ningún producto en el catálogo</p>
+            <p class="text-xs text-slate-400">Intenta buscar por otro nombre o SKU.</p>
+          </div>`;
+        return;
+      }
+
+      filtrados.forEach(p => {
+        const configMesa = mesasConfig.find(m => m.id === p.mesa) || mesasConfig[7];
+        const card = document.createElement('div');
+        card.className = "bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 flex gap-4 items-center";
+        card.innerHTML = `
+          <img src="${p.img}" alt="${p.nombre}" class="w-20 h-20 object-cover rounded-xl shrink-0 shadow-inner bg-slate-100">
+          <div class="flex-1 min-w-0">
+            <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full border ${configMesa.colorBg}">
+              ${configMesa.dot} Mesa ${p.mesa}
+            </span>
+            <h3 class="font-extrabold text-slate-800 text-sm mt-1 truncate">${p.nombre}</h3>
+            <p class="text-[11px] text-slate-400 font-mono">SKU: <span class="font-bold text-slate-600">${p.sku}</span></p>
+            <div class="flex justify-between items-center mt-2 pt-2 border-t border-slate-100 text-[11px]">
+              <span class="text-slate-500 truncate">Prov: <strong>${p.proveedor}</strong></span>
+              <span class="font-extrabold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-lg">$${p.precio.toFixed(2)}</span>
+            </div>
+          </div>`;
+        contenedor.appendChild(card);
+      });
+    };
+
     function obtenerEstadoSemaforo(fechaCambio) {
       const hoy = new Date(); hoy.setHours(0,0,0,0);
       const limite = new Date(fechaCambio + 'T00:00:00');
       const diff = Math.ceil((limite - hoy) / (1000 * 60 * 60 * 24));
 
       if (diff < 0) {
-        return { 
-          key: 'VENCIDOS', 
-          mensaje: `Vencido (${Math.abs(diff)}d)`, 
-          colorBarra: 'bg-rose-500', 
-          badge: 'bg-rose-100 text-rose-700',
-          textoDias: `Vencido hace ${Math.abs(diff)}d`,
-          textClass: 'text-rose-600'
-        };
+        return { key: 'VENCIDOS', mensaje: `Vencido (${Math.abs(diff)}d)`, colorBarra: 'bg-rose-500', badge: 'bg-rose-100 text-rose-700', textoDias: `Vencido hace ${Math.abs(diff)}d`, textClass: 'text-rose-600' };
       }
       if (diff === 0) {
-        return { 
-          key: 'VENCIDOS', 
-          mensaje: '¡Cambiar HOY!', 
-          colorBarra: 'bg-rose-500', 
-          badge: 'bg-rose-100 text-rose-700',
-          textoDias: '¡Vence HOY!',
-          textClass: 'text-rose-600'
-        };
+        return { key: 'VENCIDOS', mensaje: '¡Cambiar HOY!', colorBarra: 'bg-rose-500', badge: 'bg-rose-100 text-rose-700', textoDias: '¡Vence HOY!', textClass: 'text-rose-600' };
       }
       if (diff <= 3) {
-        return { 
-          key: 'ALERTAS', 
-          mensaje: `Cambio en ${diff}d`, 
-          colorBarra: 'bg-amber-500', 
-          badge: 'bg-amber-100 text-amber-700',
-          textoDias: `Quedan ${diff} días`,
-          textClass: 'text-amber-600'
-        };
+        return { key: 'ALERTAS', mensaje: `Cambio en ${diff}d`, colorBarra: 'bg-amber-500', badge: 'bg-amber-100 text-amber-700', textoDias: `Quedan ${diff} días`, textClass: 'text-amber-600' };
       }
-      return { 
-        key: 'FRESCOS', 
-        mensaje: `Fresco (${diff}d)`, 
-        colorBarra: 'bg-emerald-500', 
-        badge: 'bg-emerald-100 text-emerald-700',
-        textoDias: `Quedan ${diff} días`,
-        textClass: 'text-emerald-600'
-      };
+      return { key: 'FRESCOS', mensaje: `Fresco (${diff}d)`, colorBarra: 'bg-emerald-500', badge: 'bg-emerald-100 text-emerald-700', textoDias: `Quedan ${diff} días`, textClass: 'text-emerald-600' };
     }
 
     function actualizarDashboard() {
@@ -487,7 +564,7 @@
     window.cerrarModalForm = () => document.getElementById('modalForm').classList.add('hidden');
     window.actualizarDiasRecomendados = () => {
       const mesa = document.getElementById('mesa').value;
-      document.getElementById('diasVida').value = reglasMesas[mesa] || 15;
+      document.getElementById('diasVida').value = reglasMesas[mesa] || 30;
     };
 
     window.exportarCSV = () => {
