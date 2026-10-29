@@ -173,12 +173,12 @@
 
     </main>
 
-    <!-- SECCIÓN 2: CATÁLOGO DIGITAL UNIFICADO -->
+    <!-- SECCIÓN 2: CATÁLOGO DIGITAL -->
     <main id="seccionCatalogo" class="max-w-3xl mx-auto p-4 space-y-4 hidden">
       <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 space-y-3">
         <div>
-          <h2 class="font-extrabold text-slate-800 text-base">📖 Catálogo Oficial por Clasificación</h2>
-          <p class="text-xs text-slate-400 mt-0.5">Selecciona una clasificación para ver sus productos ordenados sin complicaciones.</p>
+          <h2 class="font-extrabold text-slate-800 text-base">📖 Catálogo Oficial</h2>
+          <p class="text-xs text-slate-400 mt-0.5">Filtra por tu Mesa de Colores o por Clasificación de manera independiente.</p>
         </div>
 
         <div class="relative">
@@ -186,10 +186,16 @@
           <input type="text" id="buscadorCatalogo" oninput="renderizarCatalogo()" placeholder="Buscar por nombre de dulce o código SKU..." class="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-rose-500 focus:outline-none bg-slate-50/50">
         </div>
 
-        <!-- FILTROS UNIFICADOS DE CLASIFICACIÓN -->
+        <!-- FILTRO 1: MESAS DE COLORES EN EL CATÁLOGO -->
         <div class="space-y-1.5 pt-1">
-          <span class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider block">Clasificación de Productos:</span>
-          <div id="contenedorClasificacionesCatalogo" class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1"></div>
+          <span class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider block">Filtrar por Mesa de Exhibición:</span>
+          <div id="contenedorChipsCatalogoMesas" class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1"></div>
+        </div>
+
+        <!-- FILTRO 2: CLASIFICACIÓN EXACTA -->
+        <div class="space-y-1.5 pt-1 border-t border-slate-100 pt-3">
+          <span class="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider block">Filtrar por Clasificación:</span>
+          <div id="contenedorChipsCatalogoClasif" class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1"></div>
         </div>
       </div>
 
@@ -285,6 +291,7 @@
 
     window.registros = [];
     window.mesaSeleccionada = 'TODAS';
+    window.mesaCatalogoSeleccionada = 'TODAS';
     window.clasificacionCatalogoSeleccionada = 'TODAS';
 
     // 1. PRODUCTOS DE LAS MESAS DE COLORES (ORIGINALES)
@@ -400,7 +407,7 @@
       { sku: "67940300", nombre: "PM NA NOPAL ENCHILADO GRANEL", mesa: "Naranja", proveedor: "Granel", img: "https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=400&auto=format&fit=crop&q=60" },
       { sku: "67940326", nombre: "PM NA MANZAMOY GRANEL", mesa: "Naranja", proveedor: "Granel", img: "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=400&auto=format&fit=crop&q=60" },
       { sku: "1006732484", nombre: "PM NA MANGO GO", mesa: "Naranja", proveedor: "Granel", img: "https://images.unsplash.com/photo-1553279768-865429fa0078?w=400&auto=format&fit=crop&q=60" },
-      { sku: "1006732492", nombre: "PM NA PICAPIÑA TAMARINDO GRANEL", mesa: "Naranja", proveedor: "Granel", img: "https://images.unsplash.com/photo-1550258987-190a2d41a8ba?w=400&auto=format&fit=crop&q=60" },
+      { sku: "1006732492", nombre: "PM NA PICAPIÑA TAMARINDO GRANEL", mesa: "Naranja", proveedor: "Granel", img: "https://images.unsplash.com/photo-1553279768-865429fa0078?w=400&auto=format&fit=crop&q=60" },
       { sku: "1022075396", nombre: "PM NA GOLOS GRANEL", mesa: "Naranja", proveedor: "Granel", img: "https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=400&auto=format&fit=crop&q=60" },
       { sku: "1022076830", nombre: "PM NA FRUTI MANGO SNACK GRANEL", mesa: "Naranja", proveedor: "Granel", img: "https://images.unsplash.com/photo-1553279768-865429fa0078?w=400&auto=format&fit=crop&q=60" },
       { sku: "1022442569", nombre: "PM NA MEGA SERPENTINA GRANEL", mesa: "Naranja", proveedor: "Granel", img: "https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=400&auto=format&fit=crop&q=60" },
@@ -881,13 +888,13 @@
       ["1163045610", "GALLETAS CON SNICKERS KARIBARI GR"]
     ];
 
-    // PROCESAMIENTO GENERAL: CLASIFICACIONES LIMPIAS (SIN PM VE EN EL FILTRO DE CLASIFICACIÓN)
+    // TODO VA EN MESA VERDE COMO CORRESPONDE, PERO ASIGNANDO SU CLASIFICACIÓN EXACTA
     const catalogoProductos = [
       ...baseMesasColores,
       ...nuevosVerdes.map(([sku, nombre]) => ({ sku, nombre, mesa: "Verde", proveedor: "Granel", img: "https://images.unsplash.com/photo-1549007994-cb92caebd54b?w=400&auto=format&fit=crop&q=60" })),
       ...rawCatalogoRestante.map(([sku, nombre]) => ({ sku, nombre, mesa: "Verde", proveedor: "Granel", img: "https://images.unsplash.com/photo-1549007994-cb92caebd54b?w=400&auto=format&fit=crop&q=60" }))
     ].map(p => {
-      let clasificacion = "INDIVIDUAL";
+      let clasificacion = "MERCANCÍA INDIVIDUAL (SIN PM)";
       if (p.nombre.includes("FIGU")) clasificacion = "PM FIGU";
       else if (p.nombre.includes("ENJA")) clasificacion = "PM ENJA";
       else if (p.nombre.includes("S/AZU")) clasificacion = "PM S/AZU";
@@ -896,7 +903,7 @@
       else if (p.nombre.includes("BARRA") || p.nombre.includes("BAR")) clasificacion = "PM BAR";
       else if (p.nombre.includes("HOJUE")) clasificacion = "PM HOJUE";
       else if (p.nombre.includes("CUBI")) clasificacion = "PM CUBI";
-      else if (p.nombre.startsWith("PM VE")) clasificacion = "MERCANCIA INDIVIDUAL (SIN PM)"; 
+      else if (p.nombre.startsWith("PM VE")) clasificacion = "PM VE (Chocolates Mesa Verde)";
 
       return { ...p, clasificacion };
     });
@@ -914,6 +921,7 @@
 
     const clasificacionesConfig = [
       { id: 'TODAS', nombre: 'Todas' },
+      { id: 'PM VE (Chocolates Mesa Verde)', nombre: 'PM VE (Chocolates Mesa Verde)' },
       { id: 'PM GALLE', nombre: 'PM GALLE' },
       { id: 'PM TRUF', nombre: 'PM TRUF' },
       { id: 'PM BAR', nombre: 'PM BAR' },
@@ -922,7 +930,7 @@
       { id: 'PM FIGU', nombre: 'PM FIGU' },
       { id: 'PM HOJUE', nombre: 'PM HOJUE' },
       { id: 'PM ENJA', nombre: 'PM ENJA' },
-      { id: 'INDIVIDUAL', nombre: 'Mercancía Individual (Sin PM)' }
+      { id: 'MERCANCÍA INDIVIDUAL (SIN PM)', nombre: 'Mercancía Individual (Sin PM)' }
     ];
 
     const reglasMesas = {
@@ -934,7 +942,7 @@
         document.getElementById('seccionLogin').classList.add('hidden');
         document.getElementById('appContenido').classList.remove('hidden');
         escucharBaseDeDatos();
-        renderizarClasificacionesCatalogo();
+        renderizarFiltrosCatalogo();
         renderizarCatalogo();
       } else {
         document.getElementById('seccionLogin').classList.remove('hidden');
@@ -980,7 +988,7 @@
         btnControl.className = "flex-1 py-2.5 rounded-xl text-xs font-extrabold transition text-slate-600 hover:text-slate-900";
         secCatalogo.classList.remove('hidden');
         secControl.classList.add('hidden');
-        renderizarClasificacionesCatalogo();
+        renderizarFiltrosCatalogo();
         renderizarCatalogo();
       }
     };
@@ -1057,21 +1065,39 @@
       });
     };
 
-    // CHIPS DE CLASIFICACIONES EN CATÁLOGO (FILTRO ÚNICO)
-    window.renderizarClasificacionesCatalogo = () => {
-      const contenedor = document.getElementById('contenedorClasificacionesCatalogo');
-      if (!contenedor) return;
-      contenedor.innerHTML = '';
-      clasificacionesConfig.forEach(c => {
-        const esActivo = window.clasificacionCatalogoSeleccionada === c.id;
-        const btn = document.createElement('button');
-        btn.onclick = () => { window.clasificacionCatalogoSeleccionada = c.id; renderizarClasificacionesCatalogo(); renderizarCatalogo(); };
-        btn.className = `shrink-0 px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition border ${
-          esActivo ? 'bg-rose-600 text-white border-rose-600 shadow-md' : 'bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200'
-        }`;
-        btn.textContent = c.nombre;
-        contenedor.appendChild(btn);
-      });
+    // RENDERIZAR AMBOS FILTROS EN EL CATÁLOGO (MESAS Y CLASIFICACIONES)
+    window.renderizarFiltrosCatalogo = () => {
+      // 1. Filtro de Mesas en Catálogo
+      const contMesas = document.getElementById('contenedorChipsCatalogoMesas');
+      if (contMesas) {
+        contMesas.innerHTML = '';
+        mesasConfig.forEach(m => {
+          const esActivo = window.mesaCatalogoSeleccionada === m.id;
+          const btn = document.createElement('button');
+          btn.onclick = () => { window.mesaCatalogoSeleccionada = m.id; renderizarFiltrosCatalogo(); renderizarCatalogo(); };
+          btn.className = `shrink-0 px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition border flex items-center gap-1.5 ${
+            esActivo ? 'bg-slate-900 text-white border-slate-900 shadow-md' : `${m.colorBg} opacity-80 hover:opacity-100`
+          }`;
+          btn.innerHTML = `${m.dot} <span>${m.nombre}</span>`;
+          contMesas.appendChild(btn);
+        });
+      }
+
+      // 2. Filtro de Clasificaciones en Catálogo
+      const contClasif = document.getElementById('contenedorChipsCatalogoClasif');
+      if (contClasif) {
+        contClasif.innerHTML = '';
+        clasificacionesConfig.forEach(c => {
+          const esActivo = window.clasificacionCatalogoSeleccionada === c.id;
+          const btn = document.createElement('button');
+          btn.onclick = () => { window.clasificacionCatalogoSeleccionada = c.id; renderizarFiltrosCatalogo(); renderizarCatalogo(); };
+          btn.className = `shrink-0 px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition border ${
+            esActivo ? 'bg-rose-600 text-white border-rose-600 shadow-md' : 'bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200'
+          }`;
+          btn.textContent = c.nombre;
+          contClasif.appendChild(btn);
+        });
+      }
     };
 
     window.renderizarRegistros = () => {
@@ -1136,7 +1162,7 @@
       });
     };
 
-    // RENDERIZAR CATÁLOGO DIGITAL CON FILTRO ÚNICO DE CLASIFICACIÓN
+    // RENDERIZAR CATÁLOGO DIGITAL CON AMBOS FILTROS (MESA Y CLASIFICACIÓN)
     window.renderizarCatalogo = () => {
       const contenedor = document.getElementById('contenedorCatalogoLista');
       const busqueda = document.getElementById('buscadorCatalogo').value.toLowerCase();
@@ -1146,22 +1172,17 @@
         const matchSearch = p.nombre.toLowerCase().includes(busqueda) || 
                             p.sku.toLowerCase().includes(busqueda);
         
-        let matchClasificacion = true;
-        if (window.clasificacionCatalogoSeleccionada !== 'TODAS') {
-          if (window.clasificacionCatalogoSeleccionada === 'INDIVIDUAL') {
-            matchClasificacion = p.clasificacion === 'INDIVIDUAL';
-          } else {
-            matchClasificacion = p.clasificacion === window.clasificacionCatalogoSeleccionada;
-          }
-        }
-        return matchSearch && matchClasificacion;
+        const matchMesa = window.mesaCatalogoSeleccionada === 'TODAS' || p.mesa === window.mesaCatalogoSeleccionada;
+        const matchClasif = window.clasificacionCatalogoSeleccionada === 'TODAS' || p.clasificacion === window.clasificacionCatalogoSeleccionada;
+
+        return matchSearch && matchMesa && matchClasif;
       });
 
       if (filtrados.length === 0) {
         contenedor.innerHTML = `
           <div class="col-span-full bg-white rounded-3xl p-8 text-center border border-dashed border-slate-200 my-4 space-y-2">
             <p class="text-sm font-bold text-slate-700">No se encontraron productos con estos filtros</p>
-            <p class="text-xs text-slate-400">Prueba cambiando la clasificación o limpia la búsqueda.</p>
+            <p class="text-xs text-slate-400">Prueba seleccionando "Todas" en mesa o clasificación.</p>
           </div>`;
         return;
       }
@@ -1203,7 +1224,7 @@
         return { key: 'VENCIDOS', mensaje: '¡Cambiar HOY!', colorBarra: 'bg-rose-500', badge: 'bg-rose-100 text-rose-700', textoDias: '¡Vence HOY!', textClass: 'text-rose-600' };
       }
       if (diff <= 3) {
-        return { key: 'ALERTAS', mensaje: `Cambio en ${diff}d`, colorBarra: 'bg-amber-500', badge: 'bg-amber-100 text-amber-700', textoDias: `Quedan ${diff} días`, textClass: 'text-amber-600' };
+        return { key: 'ALERTAS', mensaje: `Cambio en ${diff}d`, colorBarra: 'bg-amber-500', badge: 'bg-amber-100 text-amber-700', textoDias: `Quedan ${diff} days`, textClass: 'text-amber-600' };
       }
       return { key: 'FRESCOS', mensaje: `Fresco (${diff}d)`, colorBarra: 'bg-emerald-500', badge: 'bg-emerald-100 text-emerald-700', textoDias: `Quedan ${diff} días`, textClass: 'text-emerald-600' };
     }
