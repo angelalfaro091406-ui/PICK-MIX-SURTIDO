@@ -159,7 +159,7 @@
         </div>
       </section>
 
-      <!-- BÚSQUEDA Y CHIPS DE MESA -->
+      <!-- BÚSQUEDA Y CHIPS DE MESA (CONTROL) -->
       <section class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 space-y-3">
         <div class="relative">
           <span class="absolute left-3.5 top-3 text-slate-400 text-sm">🔍</span>
@@ -177,7 +177,7 @@
 
     </main>
 
-    <!-- SECCIÓN 2: CATÁLOGO DIGITAL TIPO LIBRO CON BÚSQUEDA Y 215 PRODUCTOS -->
+    <!-- SECCIÓN 2: CATÁLOGO DIGITAL CON BUSCADOR Y CHIPS DE MESA -->
     <main id="seccionCatalogo" class="max-w-3xl mx-auto p-4 space-y-4 hidden">
       <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 space-y-3">
         <div>
@@ -187,6 +187,12 @@
         <div class="relative">
           <span class="absolute left-3.5 top-3 text-slate-400 text-sm">🔍</span>
           <input type="text" id="buscadorCatalogo" oninput="renderizarCatalogo()" placeholder="Buscar por nombre de dulce o código SKU..." class="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl text-xs font-medium focus:ring-2 focus:ring-rose-500 focus:outline-none bg-slate-50/50">
+        </div>
+
+        <!-- FILTROS DE MESA TAMBIÉN EN EL CATÁLOGO -->
+        <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pt-1 pb-0.5">
+          <span class="text-xs font-bold text-slate-400 shrink-0 mr-1">Filtrar Mesa:</span>
+          <div id="contenedorChipsCatalogo" class="flex items-center gap-2"></div>
         </div>
       </div>
 
@@ -282,8 +288,9 @@
 
     window.registros = [];
     window.mesaSeleccionada = 'TODAS';
+    window.mesaCatalogoSeleccionada = 'TODAS';
 
-    // 215 PRODUCTOS OFICIALES CON IMÁGENES ANIMADAS / ALUSIVAS
+    // 215 PRODUCTOS OFICIALES
     const catalogoProductos = [
       // MESA AMARILLA
       { sku: "636428", nombre: "PM AM CACAHUATE FRITO SALADO GRANEL", mesa: "Amarilla", proveedor: "Granel", img: "https://images.unsplash.com/photo-1563227812-0ea4c22e6cc8?w=400&auto=format&fit=crop&q=60" },
@@ -534,6 +541,7 @@
         document.getElementById('seccionLogin').classList.add('hidden');
         document.getElementById('appContenido').classList.remove('hidden');
         escucharBaseDeDatos();
+        renderizarChipsCatalogo();
         renderizarCatalogo();
       } else {
         document.getElementById('seccionLogin').classList.remove('hidden');
@@ -580,6 +588,7 @@
         btnControl.className = "flex-1 py-2.5 rounded-xl text-xs font-extrabold transition text-slate-600 hover:text-slate-900";
         secCatalogo.classList.remove('hidden');
         secControl.classList.add('hidden');
+        renderizarChipsCatalogo();
         renderizarCatalogo();
       }
     };
@@ -640,6 +649,7 @@
       }
     };
 
+    // CHIPS PESTAÑA CONTROL
     window.renderizarChips = () => {
       const contenedor = document.getElementById('contenedorChips');
       contenedor.innerHTML = '';
@@ -647,6 +657,23 @@
         const esActivo = window.mesaSeleccionada === m.id;
         const btn = document.createElement('button');
         btn.onclick = () => { window.mesaSeleccionada = m.id; renderizarChips(); renderizarRegistros(); };
+        btn.className = `shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold transition border flex items-center gap-1.5 ${
+          esActivo ? 'bg-slate-900 text-white border-slate-900 shadow-md' : `${m.colorBg} opacity-80 hover:opacity-100`
+        }`;
+        btn.innerHTML = `${m.dot} <span>${m.nombre}</span>`;
+        contenedor.appendChild(btn);
+      });
+    };
+
+    // CHIPS PESTAÑA CATÁLOGO
+    window.renderizarChipsCatalogo = () => {
+      const contenedor = document.getElementById('contenedorChipsCatalogo');
+      if (!contenedor) return;
+      contenedor.innerHTML = '';
+      mesasConfig.forEach(m => {
+        const esActivo = window.mesaCatalogoSeleccionada === m.id;
+        const btn = document.createElement('button');
+        btn.onclick = () => { window.mesaCatalogoSeleccionada = m.id; renderizarChipsCatalogo(); renderizarCatalogo(); };
         btn.className = `shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold transition border flex items-center gap-1.5 ${
           esActivo ? 'bg-slate-900 text-white border-slate-900 shadow-md' : `${m.colorBg} opacity-80 hover:opacity-100`
         }`;
@@ -717,23 +744,25 @@
       });
     };
 
-    // RENDERIZAR EL CATÁLOGO DIGITAL CON LAS 215 TARJETAS Y ANIMACIÓN ALUSIVA
+    // RENDERIZAR CATÁLOGO CON FILTRO POR MESA Y BÚSQUEDA
     window.renderizarCatalogo = () => {
       const contenedor = document.getElementById('contenedorCatalogoLista');
       const busqueda = document.getElementById('buscadorCatalogo').value.toLowerCase();
       contenedor.innerHTML = '';
 
       const filtrados = catalogoProductos.filter(p => {
-        return p.nombre.toLowerCase().includes(busqueda) || 
-               p.sku.toLowerCase().includes(busqueda) || 
-               p.proveedor.toLowerCase().includes(busqueda);
+        const matchSearch = p.nombre.toLowerCase().includes(busqueda) || 
+                            p.sku.toLowerCase().includes(busqueda) || 
+                            p.proveedor.toLowerCase().includes(busqueda);
+        const matchMesa = window.mesaCatalogoSeleccionada === 'TODAS' || p.mesa === window.mesaCatalogoSeleccionada;
+        return matchSearch && matchMesa;
       });
 
       if (filtrados.length === 0) {
         contenedor.innerHTML = `
           <div class="col-span-full bg-white rounded-3xl p-8 text-center border border-dashed border-slate-200 my-4 space-y-2">
-            <p class="text-sm font-bold text-slate-700">No se encontró ningún producto en el catálogo</p>
-            <p class="text-xs text-slate-400">Intenta buscar por otro nombre o código SKU.</p>
+            <p class="text-sm font-bold text-slate-700">No se encontró ningún producto en esta mesa</p>
+            <p class="text-xs text-slate-400">Intenta buscar por otro nombre o selecciona otra mesa.</p>
           </div>`;
         return;
       }
@@ -812,4 +841,3 @@
   </script>
 </body>
 </html>
-
