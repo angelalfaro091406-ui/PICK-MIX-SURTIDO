@@ -537,7 +537,7 @@
       ["1129352317", "PM VE ALMENDRA CUBI CHOCOLATE S/AZU"]
     ];
 
-    // 3. RESTO DEL CATÁLOGO (CLASIFICACIONES FIGU, ENJA, S/AZU, TRUF, GALLE, BARRA, HOJUE, CUBI E INDIVIDUALES)
+    // 3. RESTO DEL CATÁLOGO 
     const rawCatalogoRestante = [
       ["528137", "PM FIGU TORTUGA CHICLOSO NUEZ"],
       ["712817", "PM FIGU CHOCOLATE LECHE"],
@@ -888,22 +888,49 @@
       ["1163045610", "GALLETAS CON SNICKERS KARIBARI GR"]
     ];
 
-    // TODO VA EN MESA VERDE COMO CORRESPONDE, PERO ASIGNANDO SU CLASIFICACIÓN EXACTA
+    // PROCESAMIENTO LIMPIO Y EXACTO: ASIGNACIÓN CORRECTA DE MESA Y CLASIFICACIÓN
     const catalogoProductos = [
       ...baseMesasColores,
       ...nuevosVerdes.map(([sku, nombre]) => ({ sku, nombre, mesa: "Verde", proveedor: "Granel", img: "https://images.unsplash.com/photo-1549007994-cb92caebd54b?w=400&auto=format&fit=crop&q=60" })),
-      ...rawCatalogoRestante.map(([sku, nombre]) => ({ sku, nombre, mesa: "Verde", proveedor: "Granel", img: "https://images.unsplash.com/photo-1549007994-cb92caebd54b?w=400&auto=format&fit=crop&q=60" }))
+      ...rawCatalogoRestante.map(([sku, nombre]) => {
+        // Asignar su mesa de colores correcta según su prefijo o tipo en el catálogo restante
+        let mesa = "Verde"; // Chocolates por defecto
+        if (nombre.includes("GALLE") || nombre.includes("GALLETA")) mesa = "Amarilla"; 
+        else if (nombre.includes("TRUF") || nombre.includes("TRUFA")) mesa = "Morada";
+        else if (nombre.includes("FIGU")) mesa = "Verde";
+        else if (nombre.includes("ENJA")) mesa = "Morada";
+        else if (nombre.includes("S/AZU")) mesa = "Verde";
+        else if (nombre.includes("BARRA") || nombre.includes("BAR")) mesa = "Verde";
+        else if (nombre.includes("HOJUE")) mesa = "Verde";
+        else if (nombre.includes("CUBI")) mesa = "Verde";
+
+        return { sku, nombre, mesa, proveedor: "Granel", img: "https://images.unsplash.com/photo-1549007994-cb92caebd54b?w=400&auto=format&fit=crop&q=60" };
+      })
     ].map(p => {
+      // CLASIFICACIÓN ESTRICTA Y LIMPIA (CADA QUIEN SU ETIQUETA REAL)
       let clasificacion = "MERCANCÍA INDIVIDUAL (SIN PM)";
+      
       if (p.nombre.includes("FIGU")) clasificacion = "PM FIGU";
       else if (p.nombre.includes("ENJA")) clasificacion = "PM ENJA";
       else if (p.nombre.includes("S/AZU")) clasificacion = "PM S/AZU";
-      else if (p.nombre.includes("TRUF")) clasificacion = "PM TRUF";
-      else if (p.nombre.includes("GALLE")) clasificacion = "PM GALLE";
+      else if (p.nombre.includes("TRUF") || p.nombre.includes("TRUFA")) clasificacion = "PM TRUF";
+      else if (p.nombre.includes("GALLE") || p.nombre.includes("GALLETA")) clasificacion = "PM GALLE";
       else if (p.nombre.includes("BARRA") || p.nombre.includes("BAR")) clasificacion = "PM BAR";
       else if (p.nombre.includes("HOJUE")) clasificacion = "PM HOJUE";
       else if (p.nombre.includes("CUBI")) clasificacion = "PM CUBI";
-      else if (p.nombre.startsWith("PM VE")) clasificacion = "PM VE (Chocolates Mesa Verde)";
+      else if (p.nombre.startsWith("PM VE") || p.mesa === "Verde" && (p.nombre.includes("CHOCOLATE") || p.nombre.includes("PASITA") || p.nombre.includes("ALMENDRA") || p.nombre.includes("NUEZ"))) {
+        clasificacion = "PM VE (Chocolates Mesa Verde)";
+      } else if (p.mesa === "Roja" || p.nombre.startsWith("PM RO")) {
+        clasificacion = "PM RO (Gomitas Mesa Roja)";
+      } else if (p.mesa === "Azul" || p.nombre.startsWith("PM AZ")) {
+        clasificacion = "PM AZ (Caramelos Mesa Azul)";
+      } else if (p.mesa === "Amarilla" || p.nombre.startsWith("PM AM")) {
+        clasificacion = "PM AM (Botanas Mesa Amarilla)";
+      } else if (p.mesa === "Naranja" || p.nombre.startsWith("PM NA")) {
+        clasificacion = "PM NA (Frutas Mesa Naranja)";
+      } else if (p.mesa === "Morada" || p.nombre.startsWith("PM MO")) {
+        clasificacion = "PM MO (Frutos Secos Mesa Morada)";
+      }
 
       return { ...p, clasificacion };
     });
@@ -1162,7 +1189,7 @@
       });
     };
 
-    // RENDERIZAR CATÁLOGO DIGITAL CON AMBOS FILTROS (MESA Y CLASIFICACIÓN)
+    // RENDERIZAR CATÁLOGO DIGITAL CON AMBOS FILTROS (MESA Y CLASIFICACIÓN CORREGIDOS)
     window.renderizarCatalogo = () => {
       const contenedor = document.getElementById('contenedorCatalogoLista');
       const busqueda = document.getElementById('buscadorCatalogo').value.toLowerCase();
@@ -1224,7 +1251,7 @@
         return { key: 'VENCIDOS', mensaje: '¡Cambiar HOY!', colorBarra: 'bg-rose-500', badge: 'bg-rose-100 text-rose-700', textoDias: '¡Vence HOY!', textClass: 'text-rose-600' };
       }
       if (diff <= 3) {
-        return { key: 'ALERTAS', mensaje: `Cambio en ${diff}d`, colorBarra: 'bg-amber-500', badge: 'bg-amber-100 text-amber-700', textoDias: `Quedan ${diff} days`, textClass: 'text-amber-600' };
+        return { key: 'ALERTAS', mensaje: `Cambio en ${diff}d`, colorBarra: 'bg-amber-500', badge: 'bg-amber-100 text-amber-700', textoDias: `Quedan ${diff} días`, textClass: 'text-amber-600' };
       }
       return { key: 'FRESCOS', mensaje: `Fresco (${diff}d)`, colorBarra: 'bg-emerald-500', badge: 'bg-emerald-100 text-emerald-700', textoDias: `Quedan ${diff} días`, textClass: 'text-emerald-600' };
     }
