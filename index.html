@@ -173,7 +173,7 @@
 
     </main>
 
-    <!-- SECCIÓN 2: CATÁLOGO DIGITAL CON MESAS Y CLASIFICACIONES INDEPENDIENTES -->
+    <!-- SECCIÓN 2: CATÁLOGO DIGITAL -->
     <main id="seccionCatalogo" class="max-w-3xl mx-auto p-4 space-y-4 hidden">
       <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 space-y-3">
         <div>
@@ -525,7 +525,7 @@
       { sku: "1189320767", nombre: "PM VE MARS M&M CHOCOLATE", mesa: "Verde", proveedor: "Mars", img: "https://images.unsplash.com/photo-1514517521153-1be72277b32f?w=400&auto=format&fit=crop&q=60" }
     ];
 
-    // 2. NUEVOS PRODUCTOS QUE ME ACABAS DE DAR (CON SU MESA VERDE CORRECTA)
+    // 2. NUEVOS PRODUCTOS VERDES QUE ME PASASTE
     const nuevosVerdes = [
       ["1056690901", "PM VE ARANDANO CUBI CHOCOLATE LECHE"],
       ["1057519611", "PM VE PASITA CUBI CHOCOLATE AMARGO"],
@@ -537,7 +537,7 @@
       ["1129352317", "PM VE ALMENDRA CUBI CHOCOLATE S/AZU"]
     ];
 
-    // 3. RESTO DEL CATÁLOGO (CLASIFICACIONES FIGU, ENJA, S/AZU, TRUF, GALLE, BARRA, HOJUE, CUBI E INDIVIDUALES)
+    // 3. RESTO DEL CATÁLOGO DE CHOCOLATES / FIGURAS / ETC. (EN MESA VERDE)
     const rawCatalogoRestante = [
       ["528137", "PM FIGU TORTUGA CHICLOSO NUEZ"],
       ["712817", "PM FIGU CHOCOLATE LECHE"],
@@ -888,22 +888,22 @@
       ["1163045610", "GALLETAS CON SNICKERS KARIBARI GR"]
     ];
 
-    // PROCESAMIENTO GENERAL DEL CATÁLOGO UNIFICADO
+    // PROCESAMIENTO GENERAL DEL CATÁLOGO UNIFICADO (CLASIFICACIONES LIMPIAS Y MESA VERDE CORRECTA)
     const catalogoProductos = [
       ...baseMesasColores,
       ...nuevosVerdes.map(([sku, nombre]) => ({ sku, nombre, mesa: "Verde", proveedor: "Granel", img: "https://images.unsplash.com/photo-1549007994-cb92caebd54b?w=400&auto=format&fit=crop&q=60" })),
       ...rawCatalogoRestante.map(([sku, nombre]) => ({ sku, nombre, mesa: "Verde", proveedor: "Granel", img: "https://images.unsplash.com/photo-1549007994-cb92caebd54b?w=400&auto=format&fit=crop&q=60" }))
     ].map(p => {
       let clasificacion = "INDIVIDUAL";
-      if (p.nombre.startsWith("PM VE")) clasificacion = "PM VE";
-      else if (p.nombre.startsWith("PM FIGU")) clasificacion = "PM FIGU";
-      else if (p.nombre.startsWith("PM ENJA")) clasificacion = "PM ENJA";
-      else if (p.nombre.startsWith("PM S/AZU")) clasificacion = "PM S/AZU";
-      else if (p.nombre.startsWith("PM TRUF")) clasificacion = "PM TRUF";
-      else if (p.nombre.startsWith("PM GALLE")) clasificacion = "PM GALLE";
-      else if (p.nombre.startsWith("PM BARRA") || p.nombre.startsWith("PM BAR")) clasificacion = "PM BAR";
-      else if (p.nombre.startsWith("PM HOJUE")) clasificacion = "PM HOJUE";
-      else if (p.nombre.startsWith("PM CUBI")) clasificacion = "PM CUBI";
+      if (p.nombre.includes("FIGU")) clasificacion = "PM FIGU";
+      else if (p.nombre.includes("ENJA")) clasificacion = "PM ENJA";
+      else if (p.nombre.includes("S/AZU")) clasificacion = "PM S/AZU";
+      else if (p.nombre.includes("TRUF")) clasificacion = "PM TRUF";
+      else if (p.nombre.includes("GALLE")) clasificacion = "PM GALLE";
+      else if (p.nombre.includes("BARRA") || p.nombre.includes("BAR")) clasificacion = "PM BAR";
+      else if (p.nombre.includes("HOJUE")) clasificacion = "PM HOJUE";
+      else if (p.nombre.includes("CUBI")) clasificacion = "PM CUBI";
+      else if (p.nombre.startsWith("PM VE")) clasificacion = "MERCANCIA INDIVIDUAL (SIN PM)"; // Los PM VE entran directo en Mesa Verde sin ser clasificación aparte
 
       return { ...p, clasificacion };
     });
@@ -921,7 +921,6 @@
 
     const clasificacionesConfig = [
       { id: 'TODAS', nombre: 'Todas' },
-      { id: 'PM VE', nombre: 'PM VE' },
       { id: 'PM GALLE', nombre: 'PM GALLE' },
       { id: 'PM TRUF', nombre: 'PM TRUF' },
       { id: 'PM BAR', nombre: 'PM BAR' },
@@ -1163,7 +1162,7 @@
       });
     };
 
-    // RENDERIZAR CATÁLOGO CON MESAS + CLASIFICACIÓN INDEPENDIENTE + BÚSQUEDA
+    // RENDERIZAR CATÁLOGO CON MESAS + CLASIFICACIÓN + BÚSQUEDA
     window.renderizarCatalogo = () => {
       const contenedor = document.getElementById('contenedorCatalogoLista');
       const busqueda = document.getElementById('buscadorCatalogo').value.toLowerCase();
