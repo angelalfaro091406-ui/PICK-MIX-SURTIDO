@@ -239,6 +239,7 @@
               <option value="Hojue">🥐 Mesa Hojue (Hojuelas - 15d)</option>
               <option value="Cubi">🍒 Mesa Cubi (Cubiertos - 10d)</option>
               <option value="S/Azu">🍏 Mesa S/Azu (Sin Azúcar - 15d)</option>
+              <option value="Indi">🍬 Mesa Indi (Individuales - 15d)</option>
             </select>
           </div>
 
@@ -535,7 +536,7 @@
       { sku: "1129352317", nombre: "PM VE ALMENDRA CUBI CHOCOLATE S/AZU", mesa: "Verde", proveedor: "Granel", img: "https://images.unsplash.com/photo-1549007994-cb92caebd54b?w=400&auto=format&fit=crop&q=60" }
     ];
 
-    // 2. RESTO DEL CATÁLOGO MAPEADO DIRECTAMENTE A SU NUEVA MESA / SECCIÓN EXACTA
+    // 2. RESTO DEL CATÁLOGO (CLASIFICADO AUTOMÁTICAMENTE O EN MESA INDIVIDUALES SI NO LLEVA PM)
     const rawCatalogoRestante = [
       ["528137", "PM FIGU TORTUGA CHICLOSO NUEZ"], ["712817", "PM FIGU CHOCOLATE LECHE"], ["712973", "PM FIGU DOMINO CHOCO BLANCO Y LECHE"],
       ["4453620", "PM FIGU LENGUAS GATO CHOCO LECHE"], ["8089574", "PM FIGU RANA ARROZ INFLADO CHOCO LECHE"], ["12925573", "PM FIGU HUESITOS CHOCOLATE LECHE"],
@@ -604,7 +605,7 @@
       ["1206822933", "PM CUBI BOLITAS COOKIES & CREAM"], ["1206822941", "PM CUBI BOLITA CHABACANO CON CHOC BLANCO"], ["1206822968", "PM CUBI FRESA CUBIERTA CHOC SEMIAMARGO"],
       ["1206822976", "PM CUBI FRESA CUBIERTA CHOCOLATE BLANCO"], ["1206822984", "PM CUBI PLATANO CHOCOLATE LECHE"], ["1206822992", "PM CUBI ARÁNDANOS CON CHOCO SEMIAMARGO"],
 
-      // Otros sueltos granel con asignación inteligente a sus respectivas mesas/secciones
+      // PRODUCTOS SIN PREFIJO PM -> SE ASIGNAN AUTOMÁTICAMENTE A LA MESA DE INDIVIDUALES ("Indi")
       ["528510", "LADRILLO C/ALMENDRA CHOC. LECHE GRANEL"], ["529702", "LADRILLO DE ARROZ DE LECHE GRANEL"], ["635472", "ENJAMBRE NUEZ CHOC LECHE GRANEL"],
       ["635511", "TRUFA EUROPEA CHOC LECHE GRANEL"], ["635561", "TRUFA NUEZ CHOC LECHE GRANEL"], ["712833", "FIGURA CHOC OBSC GRANEL"],
       ["5430895", "GALLETAS CUBIERTA CHOC GRANEL"], ["12035454", "JOSE CUERVOO CHOCOLATE 200G TURIN"], ["74911951", "GALLETA DE NUEZ GRANEL"],
@@ -662,33 +663,38 @@
       ["1161478373", "PRETZEL CON COBERTURA DE VAINILLA Y TIRA"], ["1161478381", "PRETZEL GOURMET CON COBERTURA DE CHOCOLA"], ["1161478390", "PRETZEL CON COBERTURA DE CHOCOLATE OSCUR"],
       ["1161478403", "PRETZEL CUBIERTO CON CHOCOLATE DE LECHE"], ["1161478411", "PRETZEL CUBIERTO CON CHOCOLATE DE LECHE"], ["1162329401", "GALLETA RELLENA DE MERMELADA DE F"],
       ["1163045555", "GALLETA RED VELVET KARIBARI FRUTO"], ["1163045563", "GALLETA CON MATCHA KARIBARI GRANE"], ["1163045571", "GALLETA CHOCOLATE RELLENO MALVAVI"],
-      ["1163045580", "GALLETA CON CANELA Y TROZOS GALLE"], ["1163045598", "GALLETA CHOCOLATE RELLENO CHOC GR"], ["1163045601", "GALLETA CON FERRERO KARIBARI GRA"],
+      ["1163045580", "GALLETA CON CANELA Y TROZOS GALLE"], ["1163045598", "GALLETA CHOCOLATE RELLENO CHOC GR"], ["1163045601", "GALLETAS CON FERRERO KARIBARI GRA"],
       ["1163045610", "GALLETAS CON SNICKERS KARIBARI GR"]
     ];
 
-    // CONSOLIDAR TODO EL CATÁLOGO ASIGNANDO CADA UNO A SU MESA/SECCIÓN CORRESPONDIENTE
+    // CONSOLIDAR TODO EL CATÁLOGO
     const catalogoProductos = [
       ...baseMesasColores,
       ...rawCatalogoRestante.map(([sku, nombre]) => {
         let mesa = "Verde";
         let proveedor = "Granel";
 
-        if (nombre.includes("FIGU")) mesa = "Figu";
-        else if (nombre.includes("ENJA")) mesa = "Enja";
-        else if (nombre.includes("S/AZU")) mesa = "S/Azu";
-        else if (nombre.includes("TRUF") || nombre.includes("TRUFA")) mesa = "Truf";
-        else if (nombre.includes("GALLE") || nombre.includes("GALLETA")) mesa = "Galle";
-        else if (nombre.includes("BARRA") || nombre.includes("BAR")) mesa = "Barra";
-        else if (nombre.includes("HOJUE")) mesa = "Hojue";
-        else if (nombre.includes("CUBI")) mesa = "Cubi";
-        else if (nombre.includes("LINDT") || nombre.includes("LINDOR")) { mesa = "Verde"; proveedor = "Lindt"; }
-        else if (nombre.includes("TURIN")) { mesa = "Verde"; proveedor = "Turin"; }
+        // Si NO lleva "PM ", se asigna automáticamente a la mesa de Individuales ("Indi")
+        if (!nombre.startsWith("PM ")) {
+          mesa = "Indi";
+        } else {
+          if (nombre.includes("FIGU")) mesa = "Figu";
+          else if (nombre.includes("ENJA")) mesa = "Enja";
+          else if (nombre.includes("S/AZU")) mesa = "S/Azu";
+          else if (nombre.includes("TRUF") || nombre.includes("TRUFA")) mesa = "Truf";
+          else if (nombre.includes("GALLE") || nombre.includes("GALLETA")) mesa = "Galle";
+          else if (nombre.includes("BARRA") || nombre.includes("BAR")) mesa = "Barra";
+          else if (nombre.includes("HOJUE")) mesa = "Hojue";
+          else if (nombre.includes("CUBI")) mesa = "Cubi";
+          else if (nombre.includes("LINDT") || nombre.includes("LINDOR")) { mesa = "Verde"; proveedor = "Lindt"; }
+          else if (nombre.includes("TURIN")) { mesa = "Verde"; proveedor = "Turin"; }
+        }
 
         return { sku, nombre, mesa, proveedor, img: "https://images.unsplash.com/photo-1549007994-cb92caebd54b?w=400&auto=format&fit=crop&q=60" };
       })
     ];
 
-    // CONFIGURACIÓN DE LAS MESAS Y NUEVAS SECCIONES TIPO MESA
+    // CONFIGURACIÓN DE LAS MESAS (INCLUYENDO MESA INDIVIDUALES)
     const mesasConfig = [
       { id: 'TODAS', nombre: 'Todas', colorBg: 'bg-slate-900 text-white', dot: '' },
       { id: 'Roja', nombre: 'Mesa Roja', colorBg: 'bg-rose-50 text-rose-700 border-rose-200', dot: '🔴' },
@@ -704,12 +710,13 @@
       { id: 'Barra', nombre: 'Mesa Barra', colorBg: 'bg-zinc-100 text-zinc-800 border-zinc-300', dot: '🔲' },
       { id: 'Hojue', nombre: 'Mesa Hojue', colorBg: 'bg-yellow-100 text-amber-800 border-amber-300', dot: '🥐' },
       { id: 'Cubi', nombre: 'Mesa Cubi', colorBg: 'bg-red-50 text-red-700 border-red-200', dot: '🍒' },
-      { id: 'S/Azu', nombre: 'Mesa S/Azu', colorBg: 'bg-teal-50 text-teal-800 border-teal-200', dot: '🍏' }
+      { id: 'S/Azu', nombre: 'Mesa S/Azu', colorBg: 'bg-teal-50 text-teal-800 border-teal-200', dot: '🍏' },
+      { id: 'Indi', nombre: 'Mesa Indi (Individuales)', colorBg: 'bg-indigo-50 text-indigo-800 border-indigo-200', dot: '🍬' }
     ];
 
     const reglasMesas = {
       'Roja': 15, 'Azul': 30, 'Verde': 10, 'Amarilla': 30, 'Naranja': 20, 'Morada': 15,
-      'Galle': 20, 'Truf': 10, 'Figu': 10, 'Enja': 15, 'Barra': 10, 'Hojue': 15, 'Cubi': 10, 'S/Azu': 15
+      'Galle': 20, 'Truf': 10, 'Figu': 10, 'Enja': 15, 'Barra': 10, 'Hojue': 15, 'Cubi': 10, 'S/Azu': 15, 'Indi': 15
     };
 
     onAuthStateChanged(auth, (user) => {
